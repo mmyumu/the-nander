@@ -1,7 +1,8 @@
 package com.mmyumu.nandr.components;
 
 import com.badlogic.ashley.core.Component;
- 
-public class PlayerComponent implements Component{
-	
+import com.badlogic.gdx.graphics.OrthographicCamera;
+
+public class PlayerComponent implements Component {
+    public OrthographicCamera cam = null;
 }
