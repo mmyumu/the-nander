@@ -3,12 +3,14 @@ package com.mmyumu.nandr.views;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mmyumu.nandr.NAndRGame;
 
@@ -16,15 +18,18 @@ public class MenuScreen implements Screen {
     private final Stage stage;
     private final NAndRGame parent;
     private final Skin skin;
+    private final TextureAtlas atlas;
+    private final TextureAtlas.AtlasRegion background;
 
     public MenuScreen(NAndRGame nAndRGame) {
         parent = nAndRGame;
-
         stage = new Stage(new ScreenViewport());
 
         parent.assetManager.queueAddSkin();
         parent.assetManager.manager.finishLoading();
         skin = parent.assetManager.manager.get("skin/glassy-ui.json", Skin.class);
+        atlas = parent.assetManager.manager.get("images/loading.atlas", TextureAtlas.class);
+        background = atlas.findRegion("flamebackground");
     }
 
     @Override
@@ -58,6 +63,7 @@ public class MenuScreen implements Screen {
 
         // Create a table that fills the screen. Everything else will go inside this table.
         Table table = new Table();
+        table.setBackground(new TiledDrawable(background));
         table.setFillParent(true);
 //        table.setDebug(true);
         stage.addActor(table);
