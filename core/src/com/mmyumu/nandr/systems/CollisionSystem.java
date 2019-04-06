@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.mmyumu.nandr.components.CollisionComponent;
 import com.mmyumu.nandr.components.PlayerComponent;
+import com.mmyumu.nandr.components.TypeComponent;
 
 public class CollisionSystem extends IteratingSystem {
     ComponentMapper<CollisionComponent> cm;
