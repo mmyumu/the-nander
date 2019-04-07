@@ -1,16 +1,17 @@
 package com.mmyumu.nandr.entity.components;
 
 import com.badlogic.ashley.core.Component;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Pool;
 
-public class B2dBodyComponent implements Component, Pool.Poolable {
-    public Body body;
+public class EnemyComponent implements Component, Pool.Poolable {
     public boolean isDead = false;
+    public float xPosCenter = -1;
+    public boolean isGoingLeft = false;
 
     @Override
     public void reset() {
         isDead = false;
+        xPosCenter = -1;
+        isGoingLeft = false;
     }
-
 }

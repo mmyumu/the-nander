@@ -14,8 +14,11 @@ import com.mmyumu.nandr.DFUtils;
 import com.mmyumu.nandr.LevelFactory;
 import com.mmyumu.nandr.NAndRGame;
 import com.mmyumu.nandr.controller.KeyboardController;
+import com.mmyumu.nandr.entity.components.PlayerComponent;
 import com.mmyumu.nandr.entity.systems.AnimationSystem;
+import com.mmyumu.nandr.entity.systems.BulletSystem;
 import com.mmyumu.nandr.entity.systems.CollisionSystem;
+import com.mmyumu.nandr.entity.systems.EnemySystem;
 import com.mmyumu.nandr.entity.systems.LevelGenerationSystem;
 import com.mmyumu.nandr.entity.systems.PhysicsDebugSystem;
 import com.mmyumu.nandr.entity.systems.PhysicsSystem;
@@ -51,7 +54,7 @@ public class MainScreen implements Screen {
         boing = parent.assetManager.manager.get("sounds/boing.wav", Sound.class);
         controller = new KeyboardController();
         engine = new PooledEngine();
-        lvlFactory = new LevelFactory(engine, atlas.findRegion("player"));
+        lvlFactory = new LevelFactory(engine, atlas);
 
 
         sb = new SpriteBatch();
@@ -60,14 +63,16 @@ public class MainScreen implements Screen {
         sb.setProjectionMatrix(cam.combined);
 
         engine.addSystem(new AnimationSystem());
-        engine.addSystem(new PhysicsSystem(lvlFactory.world));
+        engine.addSystem(new PhysicsSystem(lvlFactory.world, engine));
         engine.addSystem(renderingSystem);
         engine.addSystem(new PhysicsDebugSystem(lvlFactory.world, renderingSystem.getCamera()));
         engine.addSystem(new CollisionSystem());
-        engine.addSystem(new PlayerControlSystem(controller));
+        engine.addSystem(new PlayerControlSystem(controller, lvlFactory));
+        engine.addSystem(new EnemySystem());
         player = lvlFactory.createPlayer(atlas.findRegion("player"), cam);
         engine.addSystem(new WallSystem(player));
         engine.addSystem(new WaterFloorSystem(player));
+        engine.addSystem(new BulletSystem(player));
         engine.addSystem(new LevelGenerationSystem(lvlFactory));
 
         int floorWidth = (int) (40 * RenderingSystem.PPM);
@@ -100,6 +105,11 @@ public class MainScreen implements Screen {
 
         engine.update(delta);
 
+        //check if player is dead. if so show end screen
+        if ((player.getComponent(PlayerComponent.class)).isDead) {
+            DFUtils.log("YOU DIED : back to menu you go!");
+            parent.changeScreen(NAndRGame.ENDGAME);
+        }
     }
 
     @Override

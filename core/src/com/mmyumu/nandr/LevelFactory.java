@@ -3,12 +3,15 @@ package com.mmyumu.nandr;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mmyumu.nandr.entity.components.B2dBodyComponent;
+import com.mmyumu.nandr.entity.components.BulletComponent;
 import com.mmyumu.nandr.entity.components.CollisionComponent;
+import com.mmyumu.nandr.entity.components.EnemyComponent;
 import com.mmyumu.nandr.entity.components.PlayerComponent;
 import com.mmyumu.nandr.entity.components.StateComponent;
 import com.mmyumu.nandr.entity.components.TextureComponent;
@@ -16,24 +19,37 @@ import com.mmyumu.nandr.entity.components.TransformComponent;
 import com.mmyumu.nandr.entity.components.TypeComponent;
 import com.mmyumu.nandr.entity.components.WallComponent;
 import com.mmyumu.nandr.entity.components.WaterFloorComponent;
+import com.mmyumu.nandr.entity.systems.RenderingSystem;
 import com.mmyumu.nandr.simplexnoise.SimplexNoise;
 
 public class LevelFactory {
+    private final TextureAtlas atlas;
+    private final TextureRegion enemyTex;
+    private final TextureRegion platformTex;
+    private final TextureRegion bulletTex;
     private BodyFactory bodyFactory;
     public World world;
     private PooledEngine engine;
     private SimplexNoise sim;
+    private final SimplexNoise simRough;
     public int currentLevel = 0;
     private TextureRegion floorTex;
 
-    public LevelFactory(PooledEngine en, TextureRegion floorTexture) {
+    public LevelFactory(PooledEngine en, TextureAtlas atlas) {
         engine = en;
-        floorTex = floorTexture;
+        this.atlas = atlas;
+        floorTex = DFUtils.makeTextureRegion(40 * RenderingSystem.PPM, 0.5f * RenderingSystem.PPM, "111111FF");
+        enemyTex = DFUtils.makeTextureRegion(1 * RenderingSystem.PPM, 1 * RenderingSystem.PPM, "331111FF");
+        platformTex = DFUtils.makeTextureRegion(2 * RenderingSystem.PPM, 0.1f * RenderingSystem.PPM, "221122FF");
+        bulletTex = DFUtils.makeTextureRegion(10, 10, "444444FF");
         world = new World(new Vector2(0, -10f), true);
         world.setContactListener(new NAndRContactListener());
         bodyFactory = BodyFactory.getInstance(world);
+
         // create a new SimplexNoise (size,roughness,seed)
-        sim = new SimplexNoise(512, 0.85f, 1);
+        sim = new SimplexNoise(512, 0.80f, 1);
+        simRough = new SimplexNoise(512, 0.95f, 1);
+
     }
 
 
@@ -49,15 +65,19 @@ public class LevelFactory {
             float noise2 = (float) sim.getNoise(1, currentLevel, 100);    // if plat 1 exists where on x axis
             float noise3 = (float) sim.getNoise(1, currentLevel, 200);    // platform 2 exists?
             float noise4 = (float) sim.getNoise(1, currentLevel, 300);    // if 2 exists where on x axis ?
-            float noise5 = (float) sim.getNoise(1, currentLevel, 1400);    // should spring exist on p1?
-            float noise6 = (float) sim.getNoise(1, currentLevel, 2500);    // should spring exists on p2?
-            float noise7 = (float) sim.getNoise(1, currentLevel, 2700);    // should enemy exist?
-            float noise8 = (float) sim.getNoise(1, currentLevel, 3000);    // platform 1 or 2?
+            float noise5 = (float) simRough.getNoise(1, currentLevel, 1400);    // should spring exist on p1?
+            float noise6 = (float) simRough.getNoise(1, currentLevel, 2500);    // should spring exists on p2?
+            float noise7 = (float) simRough.getNoise(1, currentLevel, 2700);    // should enemy exist?
+            float noise8 = (float) simRough.getNoise(1, currentLevel, 3000);    // platform 1 or 2?
             if (noise1 > 0.2f) {
                 createPlatform(noise2 * 25 + 2, currentLevel * 2);
                 if (noise5 > 0.5f) {
                     // add bouncy platform
                     createBouncyPlatform(noise2 * 25 + 2, currentLevel * 2);
+                }
+                if (noise7 > 0.5f) {
+                    // add an enemy
+                    createEnemy(enemyTex, noise2 * 25 + 2, currentLevel * 2 + 1);
                 }
             }
             if (noise3 > 0.2f) {
@@ -65,6 +85,10 @@ public class LevelFactory {
                 if (noise6 > 0.4f) {
                     // add bouncy platform
                     createBouncyPlatform(noise4 * 25 + 2, currentLevel * 2);
+                }
+                if (noise8 > 0.5f) {
+                    // add an enemy
+                    createEnemy(enemyTex, noise4 * 25 + 2, currentLevel * 2 + 1);
                 }
             }
             currentLevel++;
@@ -217,5 +241,63 @@ public class LevelFactory {
 
             engine.addEntity(entity);
         }
+    }
+
+    public Entity createEnemy(TextureRegion tex, float x, float y) {
+        Entity entity = engine.createEntity();
+        B2dBodyComponent b2dbody = engine.createComponent(B2dBodyComponent.class);
+        TransformComponent position = engine.createComponent(TransformComponent.class);
+        TextureComponent texture = engine.createComponent(TextureComponent.class);
+        EnemyComponent enemy = engine.createComponent(EnemyComponent.class);
+        TypeComponent type = engine.createComponent(TypeComponent.class);
+        CollisionComponent colComp = engine.createComponent(CollisionComponent.class);
+
+        b2dbody.body = bodyFactory.makeCirclePolyBody(x, y, 1, BodyFactory.STONE, BodyType.KinematicBody, true);
+        position.position.set(x, y, 0);
+        texture.region = tex;
+        enemy.xPosCenter = x;
+        type.type = TypeComponent.ENEMY;
+        b2dbody.body.setUserData(entity);
+
+        entity.add(colComp);
+        entity.add(b2dbody);
+        entity.add(position);
+        entity.add(texture);
+        entity.add(enemy);
+        entity.add(type);
+
+        engine.addEntity(entity);
+
+        return entity;
+    }
+
+    public Entity createBullet(float x, float y, float xVel, float yVel) {
+        Entity entity = engine.createEntity();
+        B2dBodyComponent b2dbody = engine.createComponent(B2dBodyComponent.class);
+        TransformComponent position = engine.createComponent(TransformComponent.class);
+        TextureComponent texture = engine.createComponent(TextureComponent.class);
+        TypeComponent type = engine.createComponent(TypeComponent.class);
+        CollisionComponent colComp = engine.createComponent(CollisionComponent.class);
+        BulletComponent bul = engine.createComponent(BulletComponent.class);
+
+        b2dbody.body = bodyFactory.makeCirclePolyBody(x, y, 0.5f, BodyFactory.STONE, BodyType.DynamicBody, true);
+        b2dbody.body.setBullet(true); // increase physics computation to limit body travelling through other objects
+        bodyFactory.makeAllFixturesSensors(b2dbody.body); // make bullets sensors so they don't move player
+        position.position.set(x, y, 0);
+        texture.region = bulletTex;
+        type.type = TypeComponent.BULLET;
+        b2dbody.body.setUserData(entity);
+        bul.xVel = xVel;
+        bul.yVel = yVel;
+
+        entity.add(bul);
+        entity.add(colComp);
+        entity.add(b2dbody);
+        entity.add(position);
+        entity.add(texture);
+        entity.add(type);
+
+        engine.addEntity(entity);
+        return entity;
     }
 }
