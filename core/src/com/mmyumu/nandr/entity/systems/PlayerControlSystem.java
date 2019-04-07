@@ -1,13 +1,13 @@
-package com.mmyumu.nandr.systems;
+package com.mmyumu.nandr.entity.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
-import com.mmyumu.nandr.components.B2dBodyComponent;
-import com.mmyumu.nandr.components.PlayerComponent;
-import com.mmyumu.nandr.components.StateComponent;
+import com.mmyumu.nandr.entity.components.B2dBodyComponent;
+import com.mmyumu.nandr.entity.components.PlayerComponent;
+import com.mmyumu.nandr.entity.components.StateComponent;
 import com.mmyumu.nandr.controller.KeyboardController;
 
 public class PlayerControlSystem extends IteratingSystem {
@@ -33,6 +33,13 @@ public class PlayerControlSystem extends IteratingSystem {
         StateComponent state = sm.get(entity);
         PlayerComponent player = pm.get(entity);
         player.cam.position.y = b2body.body.getPosition().y;
+
+        // make player jump very high
+        if (player.onSpring) {
+            b2body.body.applyLinearImpulse(0, 175f, b2body.body.getWorldCenter().x, b2body.body.getWorldCenter().y, true);
+            state.set(StateComponent.STATE_JUMPING);
+            player.onSpring = false;
+        }
 
         if (b2body.body.getLinearVelocity().y > 0) {
             state.set(StateComponent.STATE_FALLING);

@@ -2,7 +2,7 @@ package com.mmyumu.nandr;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import com.mmyumu.nandr.components.TransformComponent;
+import com.mmyumu.nandr.entity.components.TransformComponent;
 
 import java.util.Comparator;
 

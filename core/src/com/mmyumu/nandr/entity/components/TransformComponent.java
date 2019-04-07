@@ -1,4 +1,4 @@
-package com.mmyumu.nandr.components;
+package com.mmyumu.nandr.entity.components;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;

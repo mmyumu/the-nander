@@ -1,4 +1,4 @@
-package com.mmyumu.nandr.systems;
+package com.mmyumu.nandr.entity.systems;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;

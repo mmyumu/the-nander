@@ -1,12 +1,12 @@
-package com.mmyumu.nandr.systems;
+package com.mmyumu.nandr.entity.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.mmyumu.nandr.components.AnimationComponent;
-import com.mmyumu.nandr.components.StateComponent;
-import com.mmyumu.nandr.components.TextureComponent;
+import com.mmyumu.nandr.entity.components.AnimationComponent;
+import com.mmyumu.nandr.entity.components.StateComponent;
+import com.mmyumu.nandr.entity.components.TextureComponent;
 
 public class AnimationSystem extends IteratingSystem {
 

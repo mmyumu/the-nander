@@ -1,4 +1,4 @@
-package com.mmyumu.nandr.systems;
+package com.mmyumu.nandr.entity.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
@@ -8,8 +8,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
-import com.mmyumu.nandr.components.B2dBodyComponent;
-import com.mmyumu.nandr.components.TransformComponent;
+import com.mmyumu.nandr.entity.components.B2dBodyComponent;
+import com.mmyumu.nandr.entity.components.TransformComponent;
 
 public class PhysicsSystem extends IteratingSystem {
 

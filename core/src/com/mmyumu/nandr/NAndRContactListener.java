@@ -1,13 +1,12 @@
 package com.mmyumu.nandr;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
-import com.mmyumu.nandr.components.CollisionComponent;
+import com.mmyumu.nandr.entity.components.CollisionComponent;
 
 public class NAndRContactListener implements ContactListener {
 
