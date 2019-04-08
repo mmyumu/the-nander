@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -30,12 +32,45 @@ public class LoadingScreen implements Screen {
     private int currentLoadingStage = 0;
 
     // timer for exiting loading screen
-    public float countDown = 5f; // 5 seconds of waiting before menu screen
+    public float countDown = 0.1f;
     private Animation<TextureAtlas.AtlasRegion> flameAnimation;
     private Table table;
     private Table loadingTable;
     private TextureAtlas.AtlasRegion background;
     private TextureAtlas.AtlasRegion copyright;
+
+
+    class LoadingBarPart extends Actor {
+        private final TextureAtlas.AtlasRegion image;
+        private final Animation<TextureAtlas.AtlasRegion> flameAnimation;
+        private float stateTime;
+        private TextureAtlas.AtlasRegion currentFrame;
+
+        public LoadingBarPart(TextureAtlas.AtlasRegion ar, Animation<TextureAtlas.AtlasRegion> an) {
+            super();
+            image = ar;
+            flameAnimation = an;
+            this.setWidth(30);
+            this.setHeight(25);
+            this.setVisible(false);
+        }
+
+        @Override
+        public void draw(Batch batch, float parentAlpha) {
+            super.draw(batch, parentAlpha);
+            batch.draw(image, getX(), getY(), 30, 30);
+            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+            batch.draw(currentFrame, getX() - 5, getY(), 40, 40);
+            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        }
+
+        @Override
+        public void act(float delta) {
+            super.act(delta);
+            stateTime += delta; // Accumulate elapsed animation time
+            currentFrame = flameAnimation.getKeyFrame(stateTime, true);
+        }
+    }
 
     public LoadingScreen(NAndRGame nAndRGame) {
         parent = nAndRGame;
@@ -160,9 +195,8 @@ public class LoadingScreen implements Screen {
         atlas = parent.assetManager.manager.get("images/loading.atlas");
         title = atlas.findRegion("staying-alight-logo");
         dash = atlas.findRegion("loading-dash");
-        flameAnimation = new Animation<TextureAtlas.AtlasRegion>(0.07f, atlas.findRegions("flames/flames"), Animation.PlayMode.LOOP);
-
         background = atlas.findRegion("flamebackground");
         copyright = atlas.findRegion("copyright");
+        flameAnimation = new Animation<TextureAtlas.AtlasRegion>(0.07f, atlas.findRegions("flames/flames"), Animation.PlayMode.LOOP);
     }
 }

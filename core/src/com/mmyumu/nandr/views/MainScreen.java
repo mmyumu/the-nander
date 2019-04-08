@@ -75,16 +75,8 @@ public class MainScreen implements Screen {
         engine.addSystem(new BulletSystem(player));
         engine.addSystem(new LevelGenerationSystem(lvlFactory));
 
-        int floorWidth = (int) (40 * RenderingSystem.PPM);
-        int floorHeight = (int) (1 * RenderingSystem.PPM);
-        TextureRegion floorRegion = DFUtils.makeTextureRegion(floorWidth, floorHeight, "11331180");
-        lvlFactory.createFloor(floorRegion);
-
-        int wFloorWidth = (int) (40 * RenderingSystem.PPM);
-        int wFloorHeight = (int) (10 * RenderingSystem.PPM);
-        TextureRegion wFloorRegion = DFUtils.makeTextureRegion(wFloorWidth, wFloorHeight, "11113380");
-        lvlFactory.createWaterFloor(wFloorRegion);
-
+        lvlFactory.createFloor();
+        lvlFactory.createWaterFloor();
 
         int wallWidth = (int) (1 * RenderingSystem.PPM);
         int wallHeight = (int) (60 * RenderingSystem.PPM);
@@ -95,6 +87,8 @@ public class MainScreen implements Screen {
 
     @Override
     public void show() {
+        PlayerComponent pc = (player.getComponent(PlayerComponent.class));
+        pc.isDead = false;
         Gdx.input.setInputProcessor(controller);
     }
 
@@ -105,9 +99,11 @@ public class MainScreen implements Screen {
 
         engine.update(delta);
 
-        //check if player is dead. if so show end screen
-        if ((player.getComponent(PlayerComponent.class)).isDead) {
+        //check if the player is dead. if so show end screen
+        PlayerComponent pc = (player.getComponent(PlayerComponent.class));
+        if (pc.isDead) {
             DFUtils.log("YOU DIED : back to menu you go!");
+            parent.lastScore = (int) pc.cam.position.y;
             parent.changeScreen(NAndRGame.ENDGAME);
         }
     }

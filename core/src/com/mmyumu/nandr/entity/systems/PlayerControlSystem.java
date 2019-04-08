@@ -36,16 +36,12 @@ public class PlayerControlSystem extends IteratingSystem {
         B2dBodyComponent b2body = bodm.get(entity);
         StateComponent state = sm.get(entity);
         PlayerComponent player = pm.get(entity);
+
+        System.out.println(state.get());
         player.cam.position.y = b2body.body.getPosition().y;
 
-        // make player jump very high
-        if (player.onSpring) {
-            b2body.body.applyLinearImpulse(0, 175f, b2body.body.getWorldCenter().x, b2body.body.getWorldCenter().y, true);
-            state.set(StateComponent.STATE_JUMPING);
-            player.onSpring = false;
-        }
 
-        if (b2body.body.getLinearVelocity().y > 0) {
+        if (b2body.body.getLinearVelocity().y > 0 && state.get() != StateComponent.STATE_FALLING) {  // NEW
             state.set(StateComponent.STATE_FALLING);
         }
 
@@ -53,16 +49,33 @@ public class PlayerControlSystem extends IteratingSystem {
             if (state.get() == StateComponent.STATE_FALLING) {
                 state.set(StateComponent.STATE_NORMAL);
             }
-            if (b2body.body.getLinearVelocity().x != 0) {
+            if (b2body.body.getLinearVelocity().x != 0 && state.get() != StateComponent.STATE_MOVING) {  // NEW
                 state.set(StateComponent.STATE_MOVING);
             }
         }
 
+        if (b2body.body.getLinearVelocity().y < 0 && state.get() == StateComponent.STATE_FALLING) {
+            // player is actually falling. check if they are on platform
+            if (player.onPlatform) {
+                //overwrite old y value with 0 t stop falling but keep x vel
+                b2body.body.setLinearVelocity(b2body.body.getLinearVelocity().x, 0f);
+            }
+        }
+
+        // make player teleport higher
+        if (player.onSpring) {
+            //b2body.body.applyLinearImpulse(0, 175f, b2body.body.getWorldCenter().x,b2body.body.getWorldCenter().y, true);
+            b2body.body.setTransform(b2body.body.getPosition().x, b2body.body.getPosition().y + 10, b2body.body.getAngle());
+            //state.set(StateComponent.STATE_JUMPING);
+            player.onSpring = false;
+        }
+
+
         if (controller.left) {
-            b2body.body.setLinearVelocity(MathUtils.lerp(b2body.body.getLinearVelocity().x, -5f, 0.2f), b2body.body.getLinearVelocity().y);
+            b2body.body.setLinearVelocity(MathUtils.lerp(b2body.body.getLinearVelocity().x, -7f, 0.2f), b2body.body.getLinearVelocity().y);
         }
         if (controller.right) {
-            b2body.body.setLinearVelocity(MathUtils.lerp(b2body.body.getLinearVelocity().x, 5f, 0.2f), b2body.body.getLinearVelocity().y);
+            b2body.body.setLinearVelocity(MathUtils.lerp(b2body.body.getLinearVelocity().x, 7f, 0.2f), b2body.body.getLinearVelocity().y);
         }
 
         if (!controller.left && !controller.right) {
@@ -71,16 +84,22 @@ public class PlayerControlSystem extends IteratingSystem {
 
         if (controller.up &&
                 (state.get() == StateComponent.STATE_NORMAL || state.get() == StateComponent.STATE_MOVING)) {
-            //b2body.body.applyForceToCenter(0, 3000,true);
-            b2body.body.applyLinearImpulse(0, 75f, b2body.body.getWorldCenter().x, b2body.body.getWorldCenter().y, true);
+            b2body.body.applyLinearImpulse(0, 12f * b2body.body.getMass(), b2body.body.getWorldCenter().x, b2body.body.getWorldCenter().y, true);
             state.set(StateComponent.STATE_JUMPING);
+            player.onPlatform = false;
+            player.onSpring = false;
         }
 
-        if(player.timeSinceLastShot > 0){
+        if (controller.down) {
+            b2body.body.applyLinearImpulse(0, -5f, b2body.body.getWorldCenter().x, b2body.body.getWorldCenter().y, true);
+        }
+
+        if (player.timeSinceLastShot > 0) {
             player.timeSinceLastShot -= deltaTime;
         }
 
         if (controller.isMouse1Down) { // if mouse button is pressed
+            //System.out.println(player.timeSinceLastShot+" ls:sd "+player.shootDelay);
             // user wants to fire
             if (player.timeSinceLastShot <= 0) { // check the player hasn't just shot
                 //player can shoot so do player shoot

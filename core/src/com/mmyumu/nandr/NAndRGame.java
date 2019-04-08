@@ -27,6 +27,8 @@ public class NAndRGame extends Game {
 
     private Music playingSong;
 
+    public int lastScore = 0;
+
     @Override
     public void create() {
         preferences = new AppPreferences();
