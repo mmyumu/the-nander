@@ -7,6 +7,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.mmyumu.nandr.LevelFactory;
+import com.mmyumu.nandr.ParticleEffectManager;
 import com.mmyumu.nandr.controller.KeyboardController;
 import com.mmyumu.nandr.entity.components.B2dBodyComponent;
 import com.mmyumu.nandr.entity.components.PlayerComponent;
@@ -37,7 +38,7 @@ public class PlayerControlSystem extends IteratingSystem {
         StateComponent state = sm.get(entity);
         PlayerComponent player = pm.get(entity);
 
-        System.out.println(state.get());
+//        System.out.println(state.get());
         player.cam.position.y = b2body.body.getPosition().y;
 
 
@@ -65,6 +66,9 @@ public class PlayerControlSystem extends IteratingSystem {
         // make player teleport higher
         if (player.onSpring) {
             //b2body.body.applyLinearImpulse(0, 175f, b2body.body.getWorldCenter().x,b2body.body.getWorldCenter().y, true);
+            //add particle effect at feet
+            lvlFactory.makeParticleEffect(ParticleEffectManager.SMOKE, b2body.body.getPosition().x, b2body.body.getPosition().y);
+            // move player
             b2body.body.setTransform(b2body.body.getPosition().x, b2body.body.getPosition().y + 10, b2body.body.getAngle());
             //state.set(StateComponent.STATE_JUMPING);
             player.onSpring = false;

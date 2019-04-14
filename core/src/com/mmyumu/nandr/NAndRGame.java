@@ -57,7 +57,11 @@ public class NAndRGame extends Game {
                 this.setScreen(preferencesScreen);
                 break;
             case APPLICATION:
-                if (mainScreen == null) mainScreen = new MainScreen(this);
+                if (mainScreen == null) {
+                    mainScreen = new MainScreen(this);
+                } else {
+                    mainScreen.resetWorld();
+                }
                 this.setScreen(mainScreen);
                 break;
             case ENDGAME:

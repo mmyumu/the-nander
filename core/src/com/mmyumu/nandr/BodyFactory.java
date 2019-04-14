@@ -50,6 +50,8 @@ public class BodyFactory {
     public static BodyFactory getInstance(World world) {
         if (thisInstance == null) {
             thisInstance = new BodyFactory(world);
+        } else {
+            thisInstance.world = world;
         }
         return thisInstance;
     }

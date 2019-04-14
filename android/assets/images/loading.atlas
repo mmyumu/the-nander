@@ -24,16 +24,9 @@ flamebackground
   orig: 64, 64
   offset: 0, 0
   index: -1
-loading-dash-old
-  rotate: false
-  xy: 546, 4
-  size: 69, 108
-  orig: 69, 108
-  offset: 0, 0
-  index: -1
 loading-dash
   rotate: false
-  xy: 617, 80
+  xy: 546, 80
   size: 39, 32
   orig: 39, 32
   offset: 0, 0

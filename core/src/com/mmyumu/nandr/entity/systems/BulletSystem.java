@@ -3,17 +3,20 @@ package com.mmyumu.nandr.entity.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+
+import com.mmyumu.nandr.LevelFactory;
 import com.mmyumu.nandr.entity.components.B2dBodyComponent;
 import com.mmyumu.nandr.entity.components.BulletComponent;
 import com.mmyumu.nandr.entity.components.Mapper;
 
 public class BulletSystem extends IteratingSystem {
-    private Entity player;
+
+    private LevelFactory lvlFactory;
 
     @SuppressWarnings("unchecked")
-    public BulletSystem(Entity player) {
+    public BulletSystem(LevelFactory lvlFactory) {
         super(Family.all(BulletComponent.class).get());
-        this.player = player;
+        this.lvlFactory = lvlFactory;
     }
 
     @Override
@@ -26,7 +29,7 @@ public class BulletSystem extends IteratingSystem {
         b2body.body.setLinearVelocity(bullet.xVel, bullet.yVel);
 
         // get player pos
-        B2dBodyComponent playerBodyComp = Mapper.b2dCom.get(player);
+        B2dBodyComponent playerBodyComp = Mapper.b2dCom.get(lvlFactory.player);
         float px = playerBodyComp.body.getPosition().x;
         float py = playerBodyComp.body.getPosition().y;
 
@@ -39,9 +42,10 @@ public class BulletSystem extends IteratingSystem {
             bullet.isDead = true;
         }
 
-        //check if bullet is dead
-        if (bullet.isDead) {
+//check if bullet is dead
+        if(bullet.isDead){
             System.out.println("Bullet died");
+            Mapper.peCom.get(bullet.particleEffect).isDead = true;
             b2body.isDead = true;
         }
     }
