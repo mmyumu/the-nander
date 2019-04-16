@@ -2,11 +2,15 @@ package com.mmyumu.nander;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -150,6 +154,20 @@ public class LevelFactory {
         entity.add(stateCom);
         entity.add(type);
 
+        engine.addEntity(entity);
+        return entity;
+    }
+
+    public Entity createMap() {
+        Entity entity = engine.createEntity();
+
+        TmxMapLoader mapLoader = new TmxMapLoader(new InternalFileHandleResolver());
+        TiledMap map = mapLoader.load("maps/test2.tmx");
+
+        TiledMapComponent mapComponent = engine.createComponent(TiledMapComponent.class);
+        mapComponent.setMapRenderer(new OrthogonalTiledMapRenderer(map, 0.125f));
+
+        entity.add(mapComponent);
         engine.addEntity(entity);
         return entity;
     }

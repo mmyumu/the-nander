@@ -11,6 +11,6 @@ public class AnimationComponent implements Component, Pool.Poolable {
 
     @Override
     public void reset() {
-        animations = new IntMap<Animation<TextureRegion>>();
+        animations = new IntMap<>();
     }
 }

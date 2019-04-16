@@ -9,8 +9,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.mmyumu.nander.ZComparator;
 import com.mmyumu.nander.entity.components.TextureComponent;
+import com.mmyumu.nander.entity.components.TiledMapComponent;
 import com.mmyumu.nander.entity.components.TransformComponent;
 
 import java.util.Comparator;
@@ -18,7 +18,7 @@ import java.util.Comparator;
 
 public class RenderingSystem extends SortedIteratingSystem {
 
-    public static final float PPM = 16.0f; // sets the amount of pixels each metre of box2d objects contains
+    public static final float PPM = 32.0f; // sets the amount of pixels each metre of box2d objects contains
 
     // this gets the height and width of our camera frustrum based off the width and height of the screen and our pixel per meter ratio
     static final float FRUSTUM_WIDTH = Gdx.graphics.getWidth() / PPM;
@@ -59,14 +59,14 @@ public class RenderingSystem extends SortedIteratingSystem {
     @SuppressWarnings("unchecked")
     public RenderingSystem(SpriteBatch batch) {
         // gets all entities with a TransofmComponent and TextureComponent
-        super(Family.all(TransformComponent.class, TextureComponent.class).get(), new ZComparator());
+        super(Family.all(TransformComponent.class, TextureComponent.class, TiledMapComponent.class).get(), new ZComparator());
 
         //creates out componentMappers
         textureM = ComponentMapper.getFor(TextureComponent.class);
         transformM = ComponentMapper.getFor(TransformComponent.class);
 
         // create the array for sorting entities
-        renderQueue = new Array<Entity>();
+        renderQueue = new Array<>();
 
         this.batch = batch;  // set our batch to the one supplied in constructor
 

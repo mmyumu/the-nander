@@ -3,7 +3,6 @@ package com.mmyumu.nander.entity.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-
 import com.mmyumu.nander.LevelFactory;
 import com.mmyumu.nander.entity.components.B2dBodyComponent;
 import com.mmyumu.nander.entity.components.BulletComponent;
@@ -42,8 +41,8 @@ public class BulletSystem extends IteratingSystem {
             bullet.isDead = true;
         }
 
-//check if bullet is dead
-        if(bullet.isDead){
+        //check if bullet is dead
+        if (bullet.isDead) {
             System.out.println("Bullet died");
             Mapper.peCom.get(bullet.particleEffect).isDead = true;
             b2body.isDead = true;

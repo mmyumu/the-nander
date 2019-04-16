@@ -19,7 +19,7 @@ import com.mmyumu.nander.entity.systems.AnimationSystem;
 import com.mmyumu.nander.entity.systems.BulletSystem;
 import com.mmyumu.nander.entity.systems.CollisionSystem;
 import com.mmyumu.nander.entity.systems.EnemySystem;
-import com.mmyumu.nander.entity.systems.LevelGenerationSystem;
+import com.mmyumu.nander.entity.systems.MapRenderingSystem;
 import com.mmyumu.nander.entity.systems.ParticleEffectSystem;
 import com.mmyumu.nander.entity.systems.PhysicsDebugSystem;
 import com.mmyumu.nander.entity.systems.PhysicsSystem;
@@ -51,7 +51,6 @@ public class MainScreen implements Screen {
         parent.assetManager.queueAddSounds();
         parent.assetManager.queueAddParticleEffects();
         parent.assetManager.manager.finishLoading();
-//        atlas = parent.assetManager.manager.get("images/game.atlas", TextureAtlas.class);
         ping = parent.assetManager.manager.get("sounds/ping.wav", Sound.class);
         boing = parent.assetManager.manager.get("sounds/boing.wav", Sound.class);
         controller = new KeyboardController();
@@ -63,10 +62,13 @@ public class MainScreen implements Screen {
         RenderingSystem renderingSystem = new RenderingSystem(sb);
         cam = renderingSystem.getCamera();
         ParticleEffectSystem particleSystem = new ParticleEffectSystem(sb, cam);
+        MapRenderingSystem mapRenderingSystem = new MapRenderingSystem(cam);
         sb.setProjectionMatrix(cam.combined);
+
 
         engine.addSystem(new AnimationSystem());
         engine.addSystem(new PhysicsSystem(lvlFactory.world));
+        engine.addSystem(mapRenderingSystem);
         engine.addSystem(renderingSystem);
         engine.addSystem(particleSystem);
         engine.addSystem(new PhysicsDebugSystem(lvlFactory.world, renderingSystem.getCamera()));
@@ -77,15 +79,8 @@ public class MainScreen implements Screen {
         engine.addSystem(new WallSystem(lvlFactory));
         engine.addSystem(new WaterFloorSystem(lvlFactory));
         engine.addSystem(new BulletSystem(lvlFactory));
-        engine.addSystem(new LevelGenerationSystem(lvlFactory));
 
-        lvlFactory.createFloor();
-        lvlFactory.createWaterFloor();
-
-        int wallWidth = (int) (1 * RenderingSystem.PPM);
-        int wallHeight = (int) (60 * RenderingSystem.PPM);
-        TextureRegion wallRegion = DFUtils.makeTextureRegion(wallWidth, wallHeight, "222222FF");
-        lvlFactory.createWalls(wallRegion); //TODO make some damn images for this stuff
+        lvlFactory.createMap();
     }
 
 
@@ -103,7 +98,7 @@ public class MainScreen implements Screen {
 
         //check if player is dead. if so show end screen
         PlayerComponent pc = (player.getComponent(PlayerComponent.class));
-        if(pc.isDead){
+        if (pc.isDead) {
             DFUtils.log("YOU DIED : back to menu you go!");
             parent.lastScore = (int) pc.cam.position.y;
             parent.changeScreen(NanderGame.ENDGAME);
@@ -131,17 +126,15 @@ public class MainScreen implements Screen {
     }
 
     // reset world or start world again
-    public void resetWorld(){
+    public void resetWorld() {
         System.out.println("Resetting world");
         engine.removeAllEntities();
         lvlFactory.resetWorld();
 
         player = lvlFactory.createPlayer(cam);
-        lvlFactory.createFloor();
-        lvlFactory.createWaterFloor();
 
-        int wallWidth = (int) (1*RenderingSystem.PPM);
-        int wallHeight = (int) (60*RenderingSystem.PPM);
+        int wallWidth = (int) (1 * RenderingSystem.PPM);
+        int wallHeight = (int) (60 * RenderingSystem.PPM);
         TextureRegion wallRegion = DFUtils.makeTextureRegion(wallWidth, wallHeight, "222222FF");
         lvlFactory.createWalls(wallRegion); //TODO make some damn images for this stuff
 

@@ -2,7 +2,6 @@ package com.mmyumu.nander.entity.systems;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -22,7 +21,7 @@ public class ParticleEffectSystem extends IteratingSystem {
     @SuppressWarnings("unchecked")
     public ParticleEffectSystem(SpriteBatch sb, OrthographicCamera cam) {
         super(Family.all(ParticleEffectComponent.class).get());
-        renderQueue = new Array<Entity>();
+        renderQueue = new Array<>();
         batch = sb;
         camera = cam;
     }
