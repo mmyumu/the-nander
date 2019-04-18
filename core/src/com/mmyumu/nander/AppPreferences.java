@@ -7,6 +7,7 @@ public class AppPreferences {
     private static final String PREF_MUSIC_VOLUME = "volume";
     private static final String PREF_MUSIC_ENABLED = "music.enabled";
     private static final String PREF_SOUND_ENABLED = "sound.enabled";
+    private static final String PREF_FPS_ENABLED = "fps.enabled";
     private static final String PREF_SOUND_VOL = "sound";
     private static final String PREFS_NAME = "b2dtut";
 
@@ -47,6 +48,15 @@ public class AppPreferences {
 
     public void setSoundVolume(float volume) {
         getPrefs().putFloat(PREF_SOUND_VOL, volume);
+        getPrefs().flush();
+    }
+
+    public Boolean isFpsEnabled() {
+        return getPrefs().getBoolean(PREF_FPS_ENABLED, true);
+    }
+
+    public void setFpsEnabled(boolean fpsEnabled) {
+        getPrefs().putBoolean(PREF_FPS_ENABLED, fpsEnabled);
         getPrefs().flush();
     }
 }
