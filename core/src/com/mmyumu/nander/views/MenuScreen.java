@@ -18,7 +18,6 @@ public class MenuScreen implements Screen {
     private final Stage stage;
     private final NanderGame parent;
     private final Skin skin;
-    private final TextureAtlas atlas;
     private final TextureAtlas.AtlasRegion background;
 
     public MenuScreen(NanderGame nanderGame) {
@@ -28,7 +27,7 @@ public class MenuScreen implements Screen {
         parent.assetManager.queueAddSkin();
         parent.assetManager.manager.finishLoading();
         skin = parent.assetManager.manager.get("skin/glassy-ui.json", Skin.class);
-        atlas = parent.assetManager.manager.get("images/loading.atlas", TextureAtlas.class);
+        TextureAtlas atlas = parent.assetManager.manager.get("images/loading.atlas", TextureAtlas.class);
         background = atlas.findRegion("flamebackground");
     }
 
@@ -36,7 +35,6 @@ public class MenuScreen implements Screen {
     public void show() {
         Gdx.input.setInputProcessor(stage);
 
-        Skin skin = new Skin(Gdx.files.internal("skin/glassy-ui.json"));
 
         TextButton newGame = new TextButton("New Game", skin);
         TextButton preferences = new TextButton("Preferences", skin);
