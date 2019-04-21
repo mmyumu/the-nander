@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.mmyumu.nander.entity.components.AnimationComponent;
 import com.mmyumu.nander.entity.components.B2dBodyComponent;
 import com.mmyumu.nander.entity.components.BulletComponent;
 import com.mmyumu.nander.entity.components.CollisionComponent;
@@ -72,7 +74,7 @@ public class LevelFactory {
         textureComponent.region = playerTex;
 
         player.setCamera(camera);
-        b2dbody.setBody(bodyFactory.makeBoxPolyBody(10, 10, 1, 1, BodyFactory.STONE, BodyType.DynamicBody));
+        b2dbody.setBody(bodyFactory.makeBoxPolyBody(10, 195, 1, 1, BodyFactory.STONE, BodyType.DynamicBody));
 
         positionComponent.setX(10f);
         positionComponent.setY(0f);
@@ -133,11 +135,11 @@ public class LevelFactory {
         Entity entity = engine.createEntity();
         B2dBodyComponent b2dbody = engine.createComponent(B2dBodyComponent.class);
         TransformComponent transformComponent = engine.createComponent(TransformComponent.class);
-//        TextureComponent texture = engine.createComponent(TextureComponent.class);
-//        AnimationComponent animCom = engine.createComponent(AnimationComponent.class);
+        TextureComponent texture = engine.createComponent(TextureComponent.class);
+        AnimationComponent animCom = engine.createComponent(AnimationComponent.class);
         StateComponent stateCom = engine.createComponent(StateComponent.class);
         TypeComponent type = engine.createComponent(TypeComponent.class);
-//        CollisionComponent colComp = engine.createComponent(CollisionComponent.class);
+        CollisionComponent colComp = engine.createComponent(CollisionComponent.class);
         BulletComponent bul = engine.createComponent(BulletComponent.class);
         PositionComponent positionComponent = engine.createComponent(PositionComponent.class);
 
@@ -148,10 +150,10 @@ public class LevelFactory {
         positionComponent.setX(x);
         positionComponent.setY(y);
         positionComponent.setZ(0f);
-//        texture.region = bulletTex;
-//        Animation anim = new Animation(0.05f, DFUtils.spriteSheetToFrames(atlas.findRegion("FlameSpriteAnimation"), 7, 1));
-//        anim.setPlayMode(Animation.PlayMode.LOOP);
-//        animCom.animations.put(0, anim);
+        texture.region = bulletTex;
+        Animation anim = new Animation(0.05f, DFUtils.spriteSheetToFrames(atlas.findRegion("FlameSpriteAnimation"), 7, 1));
+        anim.setPlayMode(Animation.PlayMode.LOOP);
+        animCom.animations.put(0, anim);
 
         type.type = TypeComponent.BULLET;
         b2dbody.getBody().setUserData(entity);
@@ -159,14 +161,14 @@ public class LevelFactory {
         bul.yVel = yVel;
 
         //attach party to bullet
-//        bul.particleEffect = makeParticleEffect(ParticleEffectManager.FIRE, b2dbody);
+        bul.particleEffect = makeParticleEffect(ParticleEffectManager.FIRE, b2dbody);
 
         entity.add(bul);
-//        entity.add(colComp);
+        entity.add(colComp);
         entity.add(b2dbody);
         entity.add(transformComponent);
-//        entity.add(texture);
-//        entity.add(animCom);
+        entity.add(texture);
+        entity.add(animCom);
         entity.add(stateCom);
         entity.add(type);
         entity.add(positionComponent);

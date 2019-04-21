@@ -45,7 +45,6 @@ public class MainScreen implements Screen {
     private OrthographicCamera camera;
     private KeyboardController controller;
     private SpriteBatch spriteBatch;
-    private final SpriteBatch overlayBatch;
     private PooledEngine engine;
     private LevelFactory lvlFactory;
 
@@ -70,7 +69,6 @@ public class MainScreen implements Screen {
 
 
         spriteBatch = new SpriteBatch();
-        overlayBatch = new SpriteBatch();
         RenderingSystem renderingSystem = new RenderingSystem(spriteBatch);
         camera = renderingSystem.getCamera();
         viewport = new FitViewport(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, camera);
@@ -91,7 +89,7 @@ public class MainScreen implements Screen {
         engine.addSystem(new PhysicsSystem(lvlFactory.world));
 
         engine.addSystem(new CollisionSystem());
-        engine.addSystem(new PlayerControlSystem(controller, lvlFactory));
+        engine.addSystem(new PlayerControlSystem(controller, lvlFactory, viewport));
         engine.addSystem(new EnemySystem());
         player = lvlFactory.createPlayer(camera);
         engine.addSystem(new WallSystem(lvlFactory));
