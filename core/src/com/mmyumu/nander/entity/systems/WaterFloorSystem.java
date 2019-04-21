@@ -11,31 +11,31 @@ import com.mmyumu.nander.entity.components.B2dBodyComponent;
 import com.mmyumu.nander.entity.components.WaterFloorComponent;
 
 public class WaterFloorSystem extends IteratingSystem {
-    private ComponentMapper<B2dBodyComponent> bm = ComponentMapper.getFor(B2dBodyComponent.class);
+    private final ComponentMapper<B2dBodyComponent> b2dBodyComponentMapper;
     private LevelFactory lvlFactory;
 
     public WaterFloorSystem(LevelFactory lvlFactory) {
         super(Family.all(WaterFloorComponent.class).get());
         this.lvlFactory = lvlFactory;
+
+        b2dBodyComponentMapper = ComponentMapper.getFor(B2dBodyComponent.class);
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        // get current y level of player entity
-        float currentyLevel = lvlFactory.player.getComponent(B2dBodyComponent.class).body.getPosition().y;
-        // get the body component of the wall we're updating
-        Body bod = bm.get(entity).body;
+        float currentyLevel = b2dBodyComponentMapper.get(lvlFactory.player).getBody().getPosition().y;
+        Body body = b2dBodyComponentMapper.get(entity).getBody();
 
         float speed = (currentyLevel / 1000);
 
         speed = speed > 0.25f ? 0.25f : speed;
 
         // make sure water doesn't get too far behind
-        if (bod.getPosition().y < currentyLevel - 50) {
-            bod.setTransform(bod.getPosition().x, currentyLevel - 50, bod.getAngle());
+        if (body.getPosition().y < currentyLevel - 50) {
+            body.setTransform(body.getPosition().x, currentyLevel - 50, body.getAngle());
         }
 
-        bod.setTransform(bod.getPosition().x, bod.getPosition().y + speed, bod.getAngle());
+        body.setTransform(body.getPosition().x, body.getPosition().y + speed, body.getAngle());
     }
 
 }

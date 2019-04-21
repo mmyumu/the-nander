@@ -20,12 +20,13 @@ public class MapRenderingSystem extends IteratingSystem {
     public void update(float deltaTime) {
         super.update(deltaTime);
 
+        camera.update();
         mapRenderer.render();
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-//        ParticleEffectComponent pec = Mapper.peCom.get(entity);
+//        ParticleEffectComponent pec = Mapper.particleEffectComponentMapper.get(entity);
         TiledMapComponent component = entity.getComponent(TiledMapComponent.class);
         mapRenderer = component.getMapRenderer();
         mapRenderer.setView(camera);

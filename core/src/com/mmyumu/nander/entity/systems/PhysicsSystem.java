@@ -9,24 +9,31 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.mmyumu.nander.entity.components.B2dBodyComponent;
+import com.mmyumu.nander.entity.components.PositionComponent;
 import com.mmyumu.nander.entity.components.TransformComponent;
 
 public class PhysicsSystem extends IteratingSystem {
 
-    private static final float MAX_STEP_TIME = 1 / 45f;
+    private static final float MAX_STEP_TIME = 1 / 60f;
     private static float accumulator = 0f;
+    private final ComponentMapper<B2dBodyComponent> b2dBodyComponentMapper;
+    private final ComponentMapper<TransformComponent> transformComponentMapper;
+    private final ComponentMapper<PositionComponent> positionComponentMapper;
 
     private World world;
     private Array<Entity> bodiesQueue;
 
-    private ComponentMapper<B2dBodyComponent> bm = ComponentMapper.getFor(B2dBodyComponent.class);
-    private ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
 
     @SuppressWarnings("unchecked")
     public PhysicsSystem(World world) {
+//        super(Family.all(B2dBodyComponent.class, TransformComponent.class, PositionComponent.class).get());
         super(Family.all(B2dBodyComponent.class, TransformComponent.class).get());
         this.world = world;
         this.bodiesQueue = new Array<>();
+
+        b2dBodyComponentMapper = ComponentMapper.getFor(B2dBodyComponent.class);
+        transformComponentMapper = ComponentMapper.getFor(TransformComponent.class);
+        positionComponentMapper = ComponentMapper.getFor(PositionComponent.class);
     }
 
     @Override
@@ -40,21 +47,26 @@ public class PhysicsSystem extends IteratingSystem {
 
             //Entity Queue
             for (Entity entity : bodiesQueue) {
-                TransformComponent tfm = tm.get(entity);
-                B2dBodyComponent bodyComp = bm.get(entity);
-                Vector2 position = bodyComp.body.getPosition();
-                tfm.position.x = position.x;
-                tfm.position.y = position.y;
-                tfm.rotation = bodyComp.body.getAngle() * MathUtils.radiansToDegrees;
-                if (bodyComp.isDead) {
+                TransformComponent transformComponent = transformComponentMapper.get(entity);
+                PositionComponent positionComponent = positionComponentMapper.get(entity);
+
+                B2dBodyComponent bodyComponent = b2dBodyComponentMapper.get(entity);
+                Vector2 position = bodyComponent.getBody().getPosition();
+                System.out.println("Entity " + entity + " [before set from body] x=" + positionComponent.getX() + ", y=" + positionComponent.getY());
+                positionComponent.setX(position.x);
+                positionComponent.setY(position.y);
+                System.out.println("Entity " + entity + "  [after set from body] x=" + positionComponent.getX() + ", y=" + positionComponent.getY());
+                transformComponent.setRotation(bodyComponent.getBody().getAngle() * MathUtils.radiansToDegrees);
+                if (bodyComponent.isDead()) {
                     System.out.println("Removing a body and entity");
-                    world.destroyBody(bodyComp.body);
+                    world.destroyBody(bodyComponent.getBody());
                     getEngine().removeEntity(entity);
                 }
-
             }
+
+            bodiesQueue.clear();
         }
-        bodiesQueue.clear();
+
     }
 
     @Override

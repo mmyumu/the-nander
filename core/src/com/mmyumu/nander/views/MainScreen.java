@@ -10,15 +10,20 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mmyumu.nander.DFUtils;
 import com.mmyumu.nander.LevelFactory;
 import com.mmyumu.nander.NanderGame;
 import com.mmyumu.nander.controller.KeyboardController;
+import com.mmyumu.nander.entity.components.FPSComponent;
+import com.mmyumu.nander.entity.components.OverlayComponent;
 import com.mmyumu.nander.entity.components.PlayerComponent;
+import com.mmyumu.nander.entity.components.PositionComponent;
 import com.mmyumu.nander.entity.systems.AnimationSystem;
 import com.mmyumu.nander.entity.systems.BulletSystem;
 import com.mmyumu.nander.entity.systems.CollisionSystem;
 import com.mmyumu.nander.entity.systems.EnemySystem;
+import com.mmyumu.nander.entity.systems.FPSSystem;
 import com.mmyumu.nander.entity.systems.MapRenderingSystem;
 import com.mmyumu.nander.entity.systems.ParticleEffectSystem;
 import com.mmyumu.nander.entity.systems.PhysicsDebugSystem;
@@ -30,11 +35,13 @@ import com.mmyumu.nander.entity.systems.WaterFloorSystem;
 
 
 public class MainScreen implements Screen {
+    private FitViewport viewport;
     private Entity player;
     private NanderGame parent;
-    private OrthographicCamera cam;
+    private OrthographicCamera camera;
     private KeyboardController controller;
-    private SpriteBatch sb;
+    private SpriteBatch spriteBatch;
+    private final SpriteBatch overlayBatch;
     private PooledEngine engine;
     private LevelFactory lvlFactory;
 
@@ -58,27 +65,50 @@ public class MainScreen implements Screen {
         lvlFactory = new LevelFactory(engine, parent.assetManager);
 
 
-        sb = new SpriteBatch();
-        RenderingSystem renderingSystem = new RenderingSystem(sb);
-        cam = renderingSystem.getCamera();
-        ParticleEffectSystem particleSystem = new ParticleEffectSystem(sb, cam);
-        MapRenderingSystem mapRenderingSystem = new MapRenderingSystem(cam);
-        sb.setProjectionMatrix(cam.combined);
+        spriteBatch = new SpriteBatch();
+        overlayBatch = new SpriteBatch();
+        RenderingSystem renderingSystem = new RenderingSystem(spriteBatch);
+        camera = renderingSystem.getCamera();
+//        viewport = new FitViewport(10, 10, camera);
+//        viewport.getCamera().update();
+//        viewport.update(10, 10);
+        ParticleEffectSystem particleSystem = new ParticleEffectSystem(spriteBatch, camera);
+//        MapRenderingSystem mapRenderingSystem = new MapRenderingSystem(camera);
+//        OverlayRenderingSystem overlayRenderingSystem = new OverlayRenderingSystem(overlayBatch, camera);
+        spriteBatch.setProjectionMatrix(camera.combined);
+
 
 
         engine.addSystem(new AnimationSystem());
-        engine.addSystem(new PhysicsSystem(lvlFactory.world));
-        engine.addSystem(mapRenderingSystem);
+
+        engine.addSystem(new FPSSystem());
+//        engine.addSystem(mapRenderingSystem);
         engine.addSystem(renderingSystem);
-        engine.addSystem(particleSystem);
         engine.addSystem(new PhysicsDebugSystem(lvlFactory.world, renderingSystem.getCamera()));
+        engine.addSystem(particleSystem);
+//        engine.addSystem(overlayRenderingSystem);
+        engine.addSystem(new PhysicsSystem(lvlFactory.world));
+
         engine.addSystem(new CollisionSystem());
         engine.addSystem(new PlayerControlSystem(controller, lvlFactory));
         engine.addSystem(new EnemySystem());
-        player = lvlFactory.createPlayer(cam);
+        player = lvlFactory.createPlayer(camera);
         engine.addSystem(new WallSystem(lvlFactory));
         engine.addSystem(new WaterFloorSystem(lvlFactory));
         engine.addSystem(new BulletSystem(lvlFactory));
+
+
+        OverlayComponent overlayComponent = new OverlayComponent();
+        PositionComponent positionComponent = new PositionComponent();
+        positionComponent.setX(10f);
+        positionComponent.setY(Gdx.graphics.getHeight() - 10f);
+        positionComponent.setZ(0f);
+
+        Entity fpsEntity = engine.createEntity();
+        fpsEntity.add(new FPSComponent());
+        fpsEntity.add(overlayComponent);
+        fpsEntity.add(positionComponent);
+        engine.addEntity(fpsEntity);
 
         lvlFactory.createMap();
     }
@@ -98,15 +128,16 @@ public class MainScreen implements Screen {
 
         //check if player is dead. if so show end screen
         PlayerComponent pc = (player.getComponent(PlayerComponent.class));
-        if (pc.isDead) {
+        if (pc.isDead()) {
             DFUtils.log("YOU DIED : back to menu you go!");
-            parent.lastScore = (int) pc.cam.position.y;
+            parent.lastScore = (int) pc.getCamera().position.y;
             parent.changeScreen(NanderGame.ENDGAME);
         }
     }
 
     @Override
     public void resize(int width, int height) {
+//        viewport.update(width, height, true);
     }
 
     @Override
@@ -131,7 +162,7 @@ public class MainScreen implements Screen {
         engine.removeAllEntities();
         lvlFactory.resetWorld();
 
-        player = lvlFactory.createPlayer(cam);
+        player = lvlFactory.createPlayer(camera);
 
         int wallWidth = (int) (1 * RenderingSystem.PPM);
         int wallHeight = (int) (60 * RenderingSystem.PPM);

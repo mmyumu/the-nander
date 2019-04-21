@@ -1,17 +1,18 @@
 package com.mmyumu.nander.entity.systems;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
-import com.mmyumu.nander.entity.components.Mapper;
 import com.mmyumu.nander.entity.components.ParticleEffectComponent;
 
 public class ParticleEffectSystem extends IteratingSystem {
 
     private static final boolean shouldRender = true;
+    private final ComponentMapper<ParticleEffectComponent> particleEffectComponentMapper;
 
     private Array<Entity> renderQueue;
     private SpriteBatch batch;
@@ -19,11 +20,13 @@ public class ParticleEffectSystem extends IteratingSystem {
 
 
     @SuppressWarnings("unchecked")
-    public ParticleEffectSystem(SpriteBatch sb, OrthographicCamera cam) {
+    public ParticleEffectSystem(SpriteBatch batch, OrthographicCamera camera) {
         super(Family.all(ParticleEffectComponent.class).get());
         renderQueue = new Array<>();
-        batch = sb;
-        camera = cam;
+        this.batch = batch;
+        this.camera = camera;
+
+        particleEffectComponentMapper = ComponentMapper.getFor(ParticleEffectComponent.class);
     }
 
     @Override
@@ -35,7 +38,7 @@ public class ParticleEffectSystem extends IteratingSystem {
         if (shouldRender) {
             batch.begin();
             for (Entity entity : renderQueue) {
-                ParticleEffectComponent pec = Mapper.peCom.get(entity);
+                ParticleEffectComponent pec = particleEffectComponentMapper.get(entity);
                 pec.particleEffect.draw(batch, deltaTime);
             }
             batch.end();
@@ -45,7 +48,7 @@ public class ParticleEffectSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        ParticleEffectComponent pec = Mapper.peCom.get(entity);
+        ParticleEffectComponent pec = particleEffectComponentMapper.get(entity);
         if (pec.isDead) {
             pec.timeTilDeath -= deltaTime;
         }

@@ -21,9 +21,9 @@ public class WallSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         // get current y level of player entity
-        float currentyLevel = lvlFactory.player.getComponent(B2dBodyComponent.class).body.getPosition().y;
+        float currentyLevel = lvlFactory.player.getComponent(B2dBodyComponent.class).getBody().getPosition().y;
         // get the body component of the wall we're updating
-        Body bod = bm.get(entity).body;
+        Body bod = bm.get(entity).getBody();
         //set the walls y position to match the player
         bod.setTransform(bod.getPosition().x, currentyLevel, bod.getAngle());
     }

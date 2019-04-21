@@ -15,26 +15,26 @@ public class NanderContactListener implements ContactListener {
 
     @Override
     public void beginContact(Contact contact) {
-        Fixture fa = contact.getFixtureA();
-        Fixture fb = contact.getFixtureB();
-
-        if (fa.getBody().getUserData() instanceof Entity &&
-                fa.getBody().getUserData() instanceof Entity) {
-            Entity entityA = (Entity) fa.getBody().getUserData();
-            Entity entityB = (Entity) fb.getBody().getUserData();
-
-            CollisionComponent colA = entityA.getComponent(CollisionComponent.class);
-            CollisionComponent colB = entityB.getComponent(CollisionComponent.class);
-
-            if (colA != null) {
-                colA.collisionEntities.add(entityB);
-                System.out.println("Collision between " + colA + " and " + entityB);
-            }
-            if (colB != null) {
-                colB.collisionEntities.add(entityA);
-                System.out.println("Collision between " + colB + " and " + entityA);
-            }
-        }
+//        Fixture fa = contact.getFixtureA();
+//        Fixture fb = contact.getFixtureB();
+//
+//        if (fa.getBody().getUserData() instanceof Entity &&
+//                fa.getBody().getUserData() instanceof Entity) {
+//            Entity entityA = (Entity) fa.getBody().getUserData();
+//            Entity entityB = (Entity) fb.getBody().getUserData();
+//
+//            CollisionComponent colA = entityA.getComponent(CollisionComponent.class);
+//            CollisionComponent colB = entityB.getComponent(CollisionComponent.class);
+//
+//            if (colA != null) {
+//                colA.collisionEntities.add(entityB);
+//                System.out.println("Collision between " + colA + " and " + entityB);
+//            }
+//            if (colB != null) {
+//                colB.collisionEntities.add(entityA);
+//                System.out.println("Collision between " + colB + " and " + entityA);
+//            }
+//        }
     }
 
     @Override

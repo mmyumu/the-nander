@@ -7,6 +7,9 @@ import com.mmyumu.nander.NanderGame;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.vSyncEnabled = false;
+		config.backgroundFPS = 59;
+		config.foregroundFPS = 59;
 		new LwjglApplication(new NanderGame(), config);
 	}
 }

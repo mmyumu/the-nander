@@ -7,58 +7,62 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.mmyumu.nander.entity.components.BulletComponent;
 import com.mmyumu.nander.entity.components.CollisionComponent;
 import com.mmyumu.nander.entity.components.EnemyComponent;
-import com.mmyumu.nander.entity.components.Mapper;
 import com.mmyumu.nander.entity.components.PlayerComponent;
 import com.mmyumu.nander.entity.components.TypeComponent;
 
 import java.util.List;
 
 public class CollisionSystem extends IteratingSystem {
-    ComponentMapper<CollisionComponent> cm;
-    ComponentMapper<PlayerComponent> pm;
-    ComponentMapper<EnemyComponent> em;
+    private final ComponentMapper<CollisionComponent> collisionComponentMapper;
+    private final ComponentMapper<TypeComponent> typeComponentMapper;
+    private final ComponentMapper<PlayerComponent> playerComponentMapper;
+    private final ComponentMapper<EnemyComponent> enemyComponentMapper;
+    private final ComponentMapper<BulletComponent> bulletComponentMapper;
 
     @SuppressWarnings("unchecked")
     public CollisionSystem() {
         super(Family.all(CollisionComponent.class).get());
 
-        cm = ComponentMapper.getFor(CollisionComponent.class);
-        pm = ComponentMapper.getFor(PlayerComponent.class);
-        em = ComponentMapper.getFor(EnemyComponent.class);
+        collisionComponentMapper = ComponentMapper.getFor(CollisionComponent.class);
+        typeComponentMapper = ComponentMapper.getFor(TypeComponent.class);
+        playerComponentMapper = ComponentMapper.getFor(PlayerComponent.class);
+        enemyComponentMapper = ComponentMapper.getFor(EnemyComponent.class);
+        bulletComponentMapper = ComponentMapper.getFor(BulletComponent.class);
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         // get collision for this entity
-        CollisionComponent cc = cm.get(entity);
+        CollisionComponent collisionComponent = collisionComponentMapper.get(entity);
         //get collided entity
-        List<Entity> collidedEntities = cc.collisionEntities;
+        List<Entity> collidedEntities = collisionComponent.getCollisionEntities();
 
-        TypeComponent thisType = entity.getComponent(TypeComponent.class);
+
+        TypeComponent thisType = typeComponentMapper.get(entity);
 
         // Do Player Collisions
         if (thisType.type == TypeComponent.PLAYER) {
             if (!collidedEntities.isEmpty()) {
                 for (Entity collidedEntity : collidedEntities) {
-                    TypeComponent type = collidedEntity.getComponent(TypeComponent.class);
+                    TypeComponent type = typeComponentMapper.get(collidedEntity);
                     if (type != null) {
                         switch (type.type) {
                             case TypeComponent.ENEMY:
                                 //do player hit enemy thing
                                 System.out.println("player hit enemy");
-                                PlayerComponent pl = pm.get(entity);
-                                pl.isDead = true;
-                                int score = (int) pl.cam.position.y;
+                                PlayerComponent pl = playerComponentMapper.get(entity);
+                                pl.setDead(true);
+                                int score = (int) pl.getCamera().position.y;
                                 System.out.println("Score = " + score);
                                 break;
                             case TypeComponent.SCENERY:
                                 //do player hit scenery thing
-                                pm.get(entity).onPlatform = true;
+                                playerComponentMapper.get(entity).setOnPlatform(true);
                                 System.out.println("player hit scenery");
                                 break;
                             case TypeComponent.SPRING:
                                 //do player hit other thing
-                                pm.get(entity).onSpring = true;
+                                playerComponentMapper.get(entity).setOnSpring(true);
                                 System.out.println("player hit spring: bounce up");
                                 break;
                             case TypeComponent.OTHER:
@@ -73,12 +77,12 @@ public class CollisionSystem extends IteratingSystem {
                         }
                     }
                 }
-                cc.collisionEntities.clear(); // collision handled reset component
+                collisionComponent.getCollisionEntities().clear(); // collision handled reset component
             }
         } else if (thisType.type == TypeComponent.ENEMY) {    // Do enemy collisions
             if (!collidedEntities.isEmpty()) {
                 for (Entity collidedEntity : collidedEntities) {
-                    TypeComponent type = collidedEntity.getComponent(TypeComponent.class);
+                    TypeComponent type = typeComponentMapper.get(collidedEntity);
                     if (type != null) {
                         switch (type.type) {
                             case TypeComponent.PLAYER:
@@ -97,9 +101,9 @@ public class CollisionSystem extends IteratingSystem {
                                 System.out.println("enemy hit other");
                                 break;
                             case TypeComponent.BULLET:
-                                EnemyComponent enemy = Mapper.enemyCom.get(entity);
+                                EnemyComponent enemy = enemyComponentMapper.get(entity);
                                 enemy.isDead = true;
-                                BulletComponent bullet = Mapper.bulletCom.get(collidedEntity);
+                                BulletComponent bullet = bulletComponentMapper.get(collidedEntity);
                                 bullet.isDead = true;
                                 System.out.println("enemy got shot");
                                 break;
@@ -108,7 +112,7 @@ public class CollisionSystem extends IteratingSystem {
                         }
                     }
                 }
-                cc.collisionEntities.clear(); // collision handled reset component
+                collisionComponent.getCollisionEntities().clear(); // collision handled reset component
             }
         }
     }

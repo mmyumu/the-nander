@@ -5,12 +5,27 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Pool;
 
 public class B2dBodyComponent implements Component, Pool.Poolable {
-    public Body body;
-    public boolean isDead = false;
+    private Body body;
+    private boolean dead = false;
 
     @Override
     public void reset() {
-        isDead = false;
+        dead = false;
     }
 
+    public Body getBody() {
+        return body;
+    }
+
+    public void setBody(Body body) {
+        this.body = body;
+    }
+
+    public boolean isDead() {
+        return dead;
+    }
+
+    public void setDead(boolean dead) {
+        this.dead = dead;
+    }
 }
