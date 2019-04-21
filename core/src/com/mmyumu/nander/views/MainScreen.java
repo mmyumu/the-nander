@@ -35,6 +35,10 @@ import com.mmyumu.nander.entity.systems.WaterFloorSystem;
 
 
 public class MainScreen implements Screen {
+    /* One Plus 6 resolution: 2280*1080 -> ratio=2.11111 */
+    private static final int VIEWPORT_WIDTH = 32;
+    private static final int VIEWPORT_HEIGHT = 15;
+
     private FitViewport viewport;
     private Entity player;
     private NanderGame parent;
@@ -51,7 +55,7 @@ public class MainScreen implements Screen {
 
 
     /**
-     * @param nanderGame
+     * @param nanderGame the game
      */
     public MainScreen(NanderGame nanderGame) {
         parent = nanderGame;
@@ -69,12 +73,9 @@ public class MainScreen implements Screen {
         overlayBatch = new SpriteBatch();
         RenderingSystem renderingSystem = new RenderingSystem(spriteBatch);
         camera = renderingSystem.getCamera();
-//        viewport = new FitViewport(10, 10, camera);
-//        viewport.getCamera().update();
-//        viewport.update(10, 10);
+        viewport = new FitViewport(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, camera);
+        viewport.getCamera().update();
         ParticleEffectSystem particleSystem = new ParticleEffectSystem(spriteBatch, camera);
-//        MapRenderingSystem mapRenderingSystem = new MapRenderingSystem(camera);
-//        OverlayRenderingSystem overlayRenderingSystem = new OverlayRenderingSystem(overlayBatch, camera);
         spriteBatch.setProjectionMatrix(camera.combined);
 
 
@@ -137,7 +138,7 @@ public class MainScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-//        viewport.update(width, height, true);
+        viewport.update(width, height, true);
     }
 
     @Override
