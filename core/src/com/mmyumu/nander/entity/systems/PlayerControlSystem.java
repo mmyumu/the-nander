@@ -43,7 +43,7 @@ public class PlayerControlSystem extends IteratingSystem {
         player.getCamera().position.y = b2body.getBody().getPosition().y;
 
 
-        System.out.println("B2D Body " + b2body + " x=" + b2body.getBody().getPosition().x + ", y=" + b2body.getBody().getPosition().y);
+//        System.out.println("B2D Body " + b2body + " x=" + b2body.getBody().getPosition().x + ", y=" + b2body.getBody().getPosition().y);
 
 //        if (b2body.body.getLinearVelocity().y == 0) {
 //            if (state.get() == StateComponent.STATE_FALLING) {
