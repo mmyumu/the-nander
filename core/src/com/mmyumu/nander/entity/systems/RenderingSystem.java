@@ -8,6 +8,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.mmyumu.nander.entity.components.OverlayComponent;
@@ -53,7 +54,7 @@ public class RenderingSystem extends SortedIteratingSystem {
     private final BitmapFont font;
     private final SpriteBatch hudBatch;
     private final SpriteBatch batch; // a reference to our spritebatch
-    private OrthogonalTiledMapRenderer mapRenderer;
+    private OrthoCachedTiledMapRenderer mapRenderer;
     private final Array<Entity> renderQueue; // an array used to allow sorting of images allowing us to draw images on top of each other
     private final Array<Entity> overlayRenderQueue; // an array used to allow sorting of images allowing us to draw images on top of each other
     private final Comparator<Entity> comparator; // a comparator to sort images based on the z position of the transfromComponent

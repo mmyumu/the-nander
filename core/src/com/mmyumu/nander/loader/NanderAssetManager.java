@@ -3,10 +3,13 @@ package com.mmyumu.nander.loader;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
 import com.badlogic.gdx.assets.loaders.SkinLoader;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public class NanderAssetManager {
@@ -27,6 +30,9 @@ public class NanderAssetManager {
     public final String waterEffect = "particles/water.pe";
     public final String fireEffect = "particles/fire.pe";
 
+    public NanderAssetManager() {
+        manager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
+    }
 
     public void queueAddParticleEffects() {
         ParticleEffectLoader.ParticleEffectParameter pep = new ParticleEffectLoader.ParticleEffectParameter();
@@ -60,5 +66,10 @@ public class NanderAssetManager {
     }
 
     public void queueAddFonts() {
+    }
+
+    public void queueAddMaps() {
+        manager.load("maps/test2-4.tmx", TiledMap.class);
+        manager.load("maps/test2-3.tmx", TiledMap.class);
     }
 }
