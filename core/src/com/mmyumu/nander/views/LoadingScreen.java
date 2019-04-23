@@ -23,11 +23,12 @@ public class LoadingScreen implements Screen {
     private TextureAtlas.AtlasRegion title;
     private TextureAtlas.AtlasRegion dash;
 
-    public final int IMAGE = 0;        // loading images
-    public final int FONT = 1;        // loading fonts
-    public final int PARTY = 2;        // loading particle effects
-    public final int SOUND = 3;        // loading sounds
-    public final int MUSIC = 4;        // loading music
+    public final int IMAGE = 0;
+    public final int FONT = 1;
+    public final int PARTY = 2;
+    public final int SOUND = 3;
+    public final int MUSIC = 4;
+    public final int MAPS = 5;
 
     private int currentLoadingStage = 0;
 
@@ -104,6 +105,8 @@ public class LoadingScreen implements Screen {
         loadingTable.add(new LoadingBarPart(dash, flameAnimation));
         loadingTable.add(new LoadingBarPart(dash, flameAnimation));
         loadingTable.add(new LoadingBarPart(dash, flameAnimation));
+        loadingTable.add(new LoadingBarPart(dash, flameAnimation));
+        loadingTable.add(new LoadingBarPart(dash, flameAnimation));
 
 
         table.add(titleImage).align(Align.center).pad(10, 0, 0, 0).colspan(10);
@@ -123,7 +126,7 @@ public class LoadingScreen implements Screen {
 
         if (parent.assetManager.manager.update()) { // Load some, will return true if done loading
             currentLoadingStage += 1;
-            if (currentLoadingStage <= 5) {
+            if (currentLoadingStage <= 6) {
                 loadingTable.getCells().get((currentLoadingStage - 1) * 2).getActor().setVisible(true);  // new
                 loadingTable.getCells().get((currentLoadingStage - 1) * 2 + 1).getActor().setVisible(true);
             }
@@ -144,13 +147,17 @@ public class LoadingScreen implements Screen {
                     System.out.println("Loading fonts....");
                     parent.assetManager.queueAddMusic();
                     break;
-                case 5:
+                case MAPS:
+                    System.out.println("Loading maps....");
+                    parent.assetManager.queueAddMaps();
+                    break;
+                case 6:
                     System.out.println("Finished");
                     break;
             }
-            if (currentLoadingStage > 5) {
+            if (currentLoadingStage > 6) {
                 countDown -= delta;
-                currentLoadingStage = 5;
+                currentLoadingStage = 6;
                 if (countDown < 0) {
                     parent.changeScreen(NanderGame.MENU);
                 }
@@ -197,6 +204,6 @@ public class LoadingScreen implements Screen {
         dash = atlas.findRegion("loading-dash");
         background = atlas.findRegion("flamebackground");
         copyright = atlas.findRegion("copyright");
-        flameAnimation = new Animation<TextureAtlas.AtlasRegion>(0.07f, atlas.findRegions("flames/flames"), Animation.PlayMode.LOOP);
+        flameAnimation = new Animation<>(0.07f, atlas.findRegions("flames/flames"), Animation.PlayMode.LOOP);
     }
 }

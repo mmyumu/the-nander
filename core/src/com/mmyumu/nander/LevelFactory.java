@@ -2,15 +2,16 @@ package com.mmyumu.nander;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -31,6 +32,9 @@ import com.mmyumu.nander.entity.components.TypeComponent;
 import com.mmyumu.nander.entity.components.WallComponent;
 import com.mmyumu.nander.loader.NanderAssetManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LevelFactory {
     private final ParticleEffectManager pem;
     private BodyFactory bodyFactory;
@@ -40,11 +44,13 @@ public class LevelFactory {
     private TextureRegion bulletTex;
     private TextureRegion playerTex;
     private TextureAtlas atlas;
+    private NanderAssetManager assetManager;
     public Entity player;
 
     public LevelFactory(PooledEngine engine, NanderAssetManager assetManager) {
         this.engine = engine;
         this.atlas = assetManager.manager.get("images/game.atlas", TextureAtlas.class);
+        this.assetManager = assetManager;
 
         playerTex = this.atlas.findRegion("player");
         bulletTex = DFUtils.makeTextureRegion(10, 10, "444444FF");
@@ -69,16 +75,15 @@ public class LevelFactory {
         TypeComponent type = engine.createComponent(TypeComponent.class);
         StateComponent stateCom = engine.createComponent(StateComponent.class);
         PositionComponent positionComponent = engine.createComponent(PositionComponent.class);
-
+        positionComponent.setX(0f);
+        positionComponent.setY(0f);
+        positionComponent.setZ(0f);
 
         textureComponent.region = playerTex;
 
         player.setCamera(camera);
-        b2dbody.setBody(bodyFactory.makeBoxPolyBody(10, 195, 1, 1, BodyFactory.STONE, BodyType.DynamicBody));
+        b2dbody.setBody(bodyFactory.makeBoxPolyBody(positionComponent.getX(), positionComponent.getY(), 1, 1, BodyFactory.STONE, BodyType.DynamicBody));
 
-        positionComponent.setX(10f);
-        positionComponent.setY(0f);
-        positionComponent.setZ(0f);
 
         type.type = TypeComponent.PLAYER;
         stateCom.set(StateComponent.STATE_NORMAL);
@@ -177,18 +182,70 @@ public class LevelFactory {
         return entity;
     }
 
+    /**
+     * Create the map entity
+     *
+     * @return the map entity
+     */
     public Entity createMap() {
         Entity entity = engine.createEntity();
 
-        TmxMapLoader mapLoader = new TmxMapLoader(new InternalFileHandleResolver());
-        TiledMap map = mapLoader.load("maps/test3.tmx");
+        List<TiledMap> maps = new ArrayList<>();
+        maps.add(assetManager.manager.get("maps/test2-4.tmx"));
+        maps.add(assetManager.manager.get("maps/test2-3.tmx"));
+
+        TiledMap map = new TiledMap();
+        MapLayers layers = map.getLayers();
+        layers.add(createMapTileLayer(maps));
 
         TiledMapComponent mapComponent = engine.createComponent(TiledMapComponent.class);
-        mapComponent.setMapRenderer(new OrthogonalTiledMapRenderer(map, 0.125f));
+        mapComponent.setMapRenderer(new OrthoCachedTiledMapRenderer(map, 0.125f));
 
         entity.add(mapComponent);
         engine.addEntity(entity);
         return entity;
+    }
+
+    /**
+     * Create generated map
+     *
+     * @param maps the list of existing maps
+     * @return the generated map
+     */
+    private TiledMapTileLayer createMapTileLayer(List<TiledMap> maps) {
+        TiledMapTileLayer layer = new TiledMapTileLayer(40, 40, 8, 8);
+
+        createMapTileLayerZone(maps, layer, 0, 0);
+        createMapTileLayerZone(maps, layer, 0, 20);
+        createMapTileLayerZone(maps, layer, 20, 0);
+        createMapTileLayerZone(maps, layer, 20, 20);
+
+        return layer;
+    }
+
+    /**
+     * Create a zone at the given offsets
+     *
+     * @param maps    the list of existing maps
+     * @param layer   the layer to populate with the generated zone
+     * @param offsetX the X offset
+     * @param offsetY the Y offset
+     */
+    private void createMapTileLayerZone(List<TiledMap> maps, TiledMapTileLayer layer, int offsetX, int offsetY) {
+        int randomIndex = (int) (Math.random() * maps.size());
+        TiledMap zoneTemplate = maps.get(randomIndex);
+        TiledMapTileLayer layerTemplate = (TiledMapTileLayer) zoneTemplate.getLayers().get("background");
+        for (int y = 0; y < 20; y++) {
+            for (int x = 0; x < 20; x++) {
+                TiledMapTileLayer.Cell cellTemplate = layerTemplate.getCell(x, y);
+                TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
+                cell.setTile(new StaticTiledMapTile(cellTemplate.getTile().getTextureRegion()));
+                cell.setFlipHorizontally(cellTemplate.getFlipHorizontally());
+                cell.setFlipVertically(cellTemplate.getFlipVertically());
+                cell.setRotation(cellTemplate.getRotation());
+                layer.setCell(x + offsetX, y + offsetY, cell);
+            }
+        }
     }
 
     public void removeEntity(Entity ent) {

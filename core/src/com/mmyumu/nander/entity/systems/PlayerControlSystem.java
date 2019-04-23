@@ -13,6 +13,9 @@ import com.mmyumu.nander.entity.components.B2dBodyComponent;
 import com.mmyumu.nander.entity.components.PlayerComponent;
 
 public class PlayerControlSystem extends IteratingSystem {
+    private static final float SPEED = 10f;
+    private static final float ACCELERATION = 1f;
+    private static final float BRAKE = 0.4f;
 
     private final ComponentMapper<PlayerComponent> pm;
     private final ComponentMapper<B2dBodyComponent> bodm;
@@ -44,25 +47,25 @@ public class PlayerControlSystem extends IteratingSystem {
         player.getCamera().position.y = b2body.getBody().getPosition().y;
 
         if (controller.left) {
-            b2body.getBody().setLinearVelocity(MathUtils.lerp(b2body.getBody().getLinearVelocity().x, -10f, 0.5f), b2body.getBody().getLinearVelocity().y);
+            b2body.getBody().setLinearVelocity(MathUtils.lerp(b2body.getBody().getLinearVelocity().x, -SPEED, ACCELERATION), b2body.getBody().getLinearVelocity().y);
         }
         if (controller.right) {
-            b2body.getBody().setLinearVelocity(MathUtils.lerp(b2body.getBody().getLinearVelocity().x, 10f, 0.5f), b2body.getBody().getLinearVelocity().y);
+            b2body.getBody().setLinearVelocity(MathUtils.lerp(b2body.getBody().getLinearVelocity().x, SPEED, ACCELERATION), b2body.getBody().getLinearVelocity().y);
         }
 
         if (!controller.left && !controller.right) {
-            b2body.getBody().setLinearVelocity(MathUtils.lerp(b2body.getBody().getLinearVelocity().x, 0, 0.5f), b2body.getBody().getLinearVelocity().y);
+            b2body.getBody().setLinearVelocity(MathUtils.lerp(b2body.getBody().getLinearVelocity().x, 0, BRAKE), b2body.getBody().getLinearVelocity().y);
         }
 
         if (controller.up) {
-            b2body.getBody().setLinearVelocity(b2body.getBody().getLinearVelocity().x, MathUtils.lerp(b2body.getBody().getLinearVelocity().y, 10f, 0.5f));
+            b2body.getBody().setLinearVelocity(b2body.getBody().getLinearVelocity().x, MathUtils.lerp(b2body.getBody().getLinearVelocity().y, SPEED, ACCELERATION));
         }
         if (controller.down) {
-            b2body.getBody().setLinearVelocity(b2body.getBody().getLinearVelocity().x, MathUtils.lerp(b2body.getBody().getLinearVelocity().y, -10f, 0.5f));
+            b2body.getBody().setLinearVelocity(b2body.getBody().getLinearVelocity().x, MathUtils.lerp(b2body.getBody().getLinearVelocity().y, -SPEED, ACCELERATION));
         }
 
         if (!controller.up && !controller.down) {
-            b2body.getBody().setLinearVelocity(b2body.getBody().getLinearVelocity().x, MathUtils.lerp(b2body.getBody().getLinearVelocity().y, 0, 0.5f));
+            b2body.getBody().setLinearVelocity(b2body.getBody().getLinearVelocity().x, MathUtils.lerp(b2body.getBody().getLinearVelocity().y, 0, BRAKE));
         }
 
 

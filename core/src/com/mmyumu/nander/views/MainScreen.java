@@ -24,7 +24,6 @@ import com.mmyumu.nander.entity.systems.BulletSystem;
 import com.mmyumu.nander.entity.systems.CollisionSystem;
 import com.mmyumu.nander.entity.systems.EnemySystem;
 import com.mmyumu.nander.entity.systems.FPSSystem;
-import com.mmyumu.nander.entity.systems.MapRenderingSystem;
 import com.mmyumu.nander.entity.systems.ParticleEffectSystem;
 import com.mmyumu.nander.entity.systems.PhysicsDebugSystem;
 import com.mmyumu.nander.entity.systems.PhysicsSystem;
