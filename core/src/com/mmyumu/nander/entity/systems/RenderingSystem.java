@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.mmyumu.nander.entity.components.OverlayComponent;
 import com.mmyumu.nander.entity.components.PositionComponent;
@@ -55,6 +54,8 @@ public class RenderingSystem extends SortedIteratingSystem {
     private final SpriteBatch hudBatch;
     private final SpriteBatch batch; // a reference to our spritebatch
     private OrthoCachedTiledMapRenderer mapRenderer;
+    private int[] backgroundLayers;
+    private int[] foregroundLayers;
     private final Array<Entity> renderQueue; // an array used to allow sorting of images allowing us to draw images on top of each other
     private final Array<Entity> overlayRenderQueue; // an array used to allow sorting of images allowing us to draw images on top of each other
     private final Comparator<Entity> comparator; // a comparator to sort images based on the z position of the transfromComponent
@@ -66,7 +67,6 @@ public class RenderingSystem extends SortedIteratingSystem {
     private final ComponentMapper<PositionComponent> positionComponentMapper;
     private final ComponentMapper<OverlayComponent> overlayComponentMapper;
     private final ComponentMapper<TiledMapComponent> tiledMapComponentMapper;
-
 
 
     @SuppressWarnings("unchecked")
@@ -109,7 +109,7 @@ public class RenderingSystem extends SortedIteratingSystem {
         camera.update();
 
         mapRenderer.setView(camera);
-        mapRenderer.render();
+        mapRenderer.render(backgroundLayers);
 
         batch.setProjectionMatrix(camera.combined);
 //        batch.enableBlending();
@@ -145,6 +145,8 @@ public class RenderingSystem extends SortedIteratingSystem {
 
         batch.end();
 
+        mapRenderer.render(foregroundLayers);
+
         hudBatch.begin();
 
         for (Entity entity : overlayRenderQueue) {
@@ -174,6 +176,8 @@ public class RenderingSystem extends SortedIteratingSystem {
         } else if (tiledMapComponent != null) {
             TiledMapComponent component = entity.getComponent(TiledMapComponent.class);
             mapRenderer = component.getMapRenderer();
+            backgroundLayers = component.getBackgroundLayers();
+            foregroundLayers = component.getForegroundLayers();
         } else if (textureComponent != null && transformComponent != null) {
             renderQueue.add(entity);
         }
