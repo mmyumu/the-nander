@@ -87,7 +87,14 @@ public class LevelFactory {
         textureComponent.region = playerTex;
 
         player.setCamera(camera);
-        b2dbody.setBody(bodyFactory.makeBoxPolyBody(positionComponent.getX(), positionComponent.getY(), 1, 1, BodyFactory.STONE, BodyType.DynamicBody));
+        b2dbody.setBody(bodyFactory.makeBoxPolyBody(
+                positionComponent.getX(),
+                positionComponent.getY(),
+                1,
+                1,
+                BodyFactory.STONE,
+                BodyType.DynamicBody,
+                true));
 
 
         type.type = TypeComponent.PLAYER;
