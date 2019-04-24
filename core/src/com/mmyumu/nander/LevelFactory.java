@@ -7,11 +7,15 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapLayers;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -36,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LevelFactory {
+    private static final float TILED_MAP_RATIO = 1 / 8f;
     private final ParticleEffectManager pem;
     private BodyFactory bodyFactory;
     public World world;
@@ -75,8 +80,8 @@ public class LevelFactory {
         TypeComponent type = engine.createComponent(TypeComponent.class);
         StateComponent stateCom = engine.createComponent(StateComponent.class);
         PositionComponent positionComponent = engine.createComponent(PositionComponent.class);
-        positionComponent.setX(0f);
-        positionComponent.setY(0f);
+        positionComponent.setX(1f);
+        positionComponent.setY(1f);
         positionComponent.setZ(0f);
 
         textureComponent.region = playerTex;
@@ -199,7 +204,7 @@ public class LevelFactory {
         layers.add(createMapTileLayer(maps));
 
         TiledMapComponent mapComponent = engine.createComponent(TiledMapComponent.class);
-        mapComponent.setMapRenderer(new OrthoCachedTiledMapRenderer(map, 0.125f));
+        mapComponent.setMapRenderer(new OrthoCachedTiledMapRenderer(map, TILED_MAP_RATIO));
 
         entity.add(mapComponent);
         engine.addEntity(entity);
@@ -233,17 +238,32 @@ public class LevelFactory {
      */
     private void createMapTileLayerZone(List<TiledMap> maps, TiledMapTileLayer layer, int offsetX, int offsetY) {
         int randomIndex = (int) (Math.random() * maps.size());
-        TiledMap zoneTemplate = maps.get(randomIndex);
-        TiledMapTileLayer layerTemplate = (TiledMapTileLayer) zoneTemplate.getLayers().get("background");
+        TiledMap zoneTemplate = maps.get(0);
+        TiledMapTileLayer backgroundLayerTemplate = (TiledMapTileLayer) zoneTemplate.getLayers().get("background");
         for (int y = 0; y < 20; y++) {
             for (int x = 0; x < 20; x++) {
-                TiledMapTileLayer.Cell cellTemplate = layerTemplate.getCell(x, y);
+                TiledMapTileLayer.Cell cellTemplate = backgroundLayerTemplate.getCell(x, y);
                 TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
                 cell.setTile(new StaticTiledMapTile(cellTemplate.getTile().getTextureRegion()));
                 cell.setFlipHorizontally(cellTemplate.getFlipHorizontally());
                 cell.setFlipVertically(cellTemplate.getFlipVertically());
                 cell.setRotation(cellTemplate.getRotation());
                 layer.setCell(x + offsetX, y + offsetY, cell);
+            }
+        }
+
+        MapLayer objectLayerTemplate = zoneTemplate.getLayers().get("obstacle");
+        for (MapObject object : objectLayerTemplate.getObjects()) {
+            if (object instanceof RectangleMapObject) {
+                RectangleMapObject rectangleMapObject = (RectangleMapObject) object;
+                Rectangle rectangle = rectangleMapObject.getRectangle();
+
+                bodyFactory.makeBoxPolyBody((rectangle.x + rectangle.width / 2) * TILED_MAP_RATIO + offsetX,
+                        (rectangle.y + rectangle.height / 2) * TILED_MAP_RATIO + offsetY,
+                        rectangle.width * TILED_MAP_RATIO,
+                        rectangle.height * TILED_MAP_RATIO,
+                        BodyFactory.STONE,
+                        BodyType.StaticBody);
             }
         }
     }
