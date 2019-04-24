@@ -41,6 +41,9 @@ import java.util.List;
 
 public class LevelFactory {
     private static final float TILED_MAP_RATIO = 1 / 8f;
+    private static final String BACKGROUND_LAYER_NAME = "background";
+    private static final String FOREGROUND_LAYER_NAME = "foreground";
+
     private final ParticleEffectManager pem;
     private BodyFactory bodyFactory;
     public World world;
@@ -208,10 +211,15 @@ public class LevelFactory {
 
         TiledMap map = new TiledMap();
         MapLayers layers = map.getLayers();
-        layers.add(createMapTileLayer(maps));
+        List<MapLayer> generatedLayers = createMapTileLayer(maps);
+        for (MapLayer generatedLayer : generatedLayers) {
+            layers.add(generatedLayer);
+        }
 
         TiledMapComponent mapComponent = engine.createComponent(TiledMapComponent.class);
         mapComponent.setMapRenderer(new OrthoCachedTiledMapRenderer(map, TILED_MAP_RATIO));
+        mapComponent.setBackgroundLayers(new int[]{map.getLayers().getIndex(BACKGROUND_LAYER_NAME)});
+        mapComponent.setForegroundLayers(new int[]{map.getLayers().getIndex(FOREGROUND_LAYER_NAME)});
 
         entity.add(mapComponent);
         engine.addEntity(entity);
@@ -224,38 +232,51 @@ public class LevelFactory {
      * @param maps the list of existing maps
      * @return the generated map
      */
-    private TiledMapTileLayer createMapTileLayer(List<TiledMap> maps) {
-        TiledMapTileLayer layer = new TiledMapTileLayer(40, 40, 8, 8);
+    private List<MapLayer> createMapTileLayer(List<TiledMap> maps) {
+        List<MapLayer> layers = new ArrayList<>();
 
-        createMapTileLayerZone(maps, layer, 0, 0);
-        createMapTileLayerZone(maps, layer, 0, 20);
-        createMapTileLayerZone(maps, layer, 20, 0);
-        createMapTileLayerZone(maps, layer, 20, 20);
+        TiledMapTileLayer backgroundLayer = new TiledMapTileLayer(40, 40, 8, 8);
+        TiledMapTileLayer foregroundLayer = new TiledMapTileLayer(40, 40, 8, 8);
+        backgroundLayer.setName(BACKGROUND_LAYER_NAME);
+        foregroundLayer.setName(FOREGROUND_LAYER_NAME);
 
-        return layer;
+        createMapTileLayerZone(maps, backgroundLayer, foregroundLayer, 0, 0);
+        createMapTileLayerZone(maps, backgroundLayer, foregroundLayer, 0, 20);
+        createMapTileLayerZone(maps, backgroundLayer, foregroundLayer, 20, 0);
+        createMapTileLayerZone(maps, backgroundLayer, foregroundLayer, 20, 20);
+
+        layers.add(backgroundLayer);
+        layers.add(foregroundLayer);
+        return layers;
     }
 
     /**
      * Create a zone at the given offsets
      *
-     * @param maps    the list of existing maps
-     * @param layer   the layer to populate with the generated zone
-     * @param offsetX the X offset
-     * @param offsetY the Y offset
+     * @param maps            the list of existing maps
+     * @param backgroundLayer the background layer to populate with the generated zone
+     * @param backgroundLayer the foreground layer to populate with the generated zone
+     * @param offsetX         the X offset
+     * @param offsetY         the Y offset
      */
-    private void createMapTileLayerZone(List<TiledMap> maps, TiledMapTileLayer layer, int offsetX, int offsetY) {
+    private void createMapTileLayerZone(List<TiledMap> maps,
+                                        TiledMapTileLayer backgroundLayer,
+                                        TiledMapTileLayer foregroundLayer,
+                                        int offsetX,
+                                        int offsetY) {
         int randomIndex = (int) (Math.random() * maps.size());
-        TiledMap zoneTemplate = maps.get(0);
-        TiledMapTileLayer backgroundLayerTemplate = (TiledMapTileLayer) zoneTemplate.getLayers().get("background");
+        TiledMap zoneTemplate = maps.get(randomIndex);
+        TiledMapTileLayer backgroundLayerTemplate = (TiledMapTileLayer) zoneTemplate.getLayers().get(BACKGROUND_LAYER_NAME);
+        TiledMapTileLayer foregroundLayerTemplate = (TiledMapTileLayer) zoneTemplate.getLayers().get(FOREGROUND_LAYER_NAME);
+
         for (int y = 0; y < 20; y++) {
             for (int x = 0; x < 20; x++) {
-                TiledMapTileLayer.Cell cellTemplate = backgroundLayerTemplate.getCell(x, y);
-                TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
-                cell.setTile(new StaticTiledMapTile(cellTemplate.getTile().getTextureRegion()));
-                cell.setFlipHorizontally(cellTemplate.getFlipHorizontally());
-                cell.setFlipVertically(cellTemplate.getFlipVertically());
-                cell.setRotation(cellTemplate.getRotation());
-                layer.setCell(x + offsetX, y + offsetY, cell);
+                if (backgroundLayerTemplate != null) {
+                    backgroundLayer.setCell(x + offsetX, y + offsetY, createCell(backgroundLayerTemplate, x, y));
+                }
+                if (foregroundLayerTemplate != null) {
+                    foregroundLayer.setCell(x + offsetX, y + offsetY, createCell(foregroundLayerTemplate, x, y));
+                }
             }
         }
 
@@ -273,6 +294,20 @@ public class LevelFactory {
                         BodyType.StaticBody);
             }
         }
+    }
+
+    private TiledMapTileLayer.Cell createCell(TiledMapTileLayer layerTemplate, int x, int y) {
+        TiledMapTileLayer.Cell cellTemplate = layerTemplate.getCell(x, y);
+        if (cellTemplate == null) {
+            return null;
+        }
+        TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
+        cell.setTile(new StaticTiledMapTile(cellTemplate.getTile().getTextureRegion()));
+        cell.setFlipHorizontally(cellTemplate.getFlipHorizontally());
+        cell.setFlipVertically(cellTemplate.getFlipVertically());
+        cell.setRotation(cellTemplate.getRotation());
+
+        return cell;
     }
 
     public void removeEntity(Entity ent) {
