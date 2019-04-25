@@ -3,6 +3,7 @@ package com.mmyumu.nander;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -87,14 +88,20 @@ public class LevelFactory {
         positionComponent.setY(1f);
         positionComponent.setZ(0f);
 
-        textureComponent.region = playerTex;
+//        textureComponent.region = playerTex;
+//        textureComponent.region = new TextureRegion(assetManager.manager.get("images/character1.png", Texture.class));
+//        textureComponent.region = new TextureRegion(assetManager.manager.get("images/character24.png", Texture.class));
+        textureComponent.region = new TextureRegion(assetManager.manager.get("images/character30.png", Texture.class));
+//        textureComponent.region.setRegionHeight(32);
+//        textureComponent.region.setRegionWidth(32);
+        transformComponent.setScale(2f, 2f);
 
         player.setCamera(camera);
         b2dbody.setBody(bodyFactory.makeBoxPolyBody(
                 positionComponent.getX(),
                 positionComponent.getY(),
-                1,
-                1,
+                1.875f,
+                1.875f,
                 BodyFactory.STONE,
                 BodyType.DynamicBody,
                 true));
