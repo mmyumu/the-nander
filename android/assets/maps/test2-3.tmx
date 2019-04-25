@@ -25,7 +25,7 @@
 33,3,3,3,3,3,3,3,3,33,33,33,33,3,3,3,3,3,3,33
 </data>
  </layer>
- <layer id="3" name="foreground" width="20" height="20" visible="0">
+ <layer id="3" name="foreground" width="20" height="20">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,97,97,97,97,97,97,97,0,0,0,97,97,97,97,97,97,0,0,
