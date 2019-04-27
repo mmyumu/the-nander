@@ -11,16 +11,18 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mmyumu.nander.LevelFactory;
 import com.mmyumu.nander.controller.KeyboardController;
 import com.mmyumu.nander.entity.components.B2dBodyComponent;
+import com.mmyumu.nander.entity.components.ParticleEffectComponent;
 import com.mmyumu.nander.entity.components.PlayerComponent;
 
 public class PlayerControlSystem extends IteratingSystem {
-    private static final float BULLET_SPEED = 15f;
+    private static final float BULLET_SPEED = 10f;
     private static final float PLAYER_SPEED = 10f;
     private static final float ACCELERATION = 1f;
 
     private final ComponentMapper<PlayerComponent> pm;
     private final ComponentMapper<B2dBodyComponent> bodm;
     private final KeyboardController controller;
+    private final ComponentMapper<ParticleEffectComponent> particleEffectComponentMapper;
     private LevelFactory lvlFactory;
     private Viewport viewport;
 
@@ -42,15 +44,16 @@ public class PlayerControlSystem extends IteratingSystem {
 
         this.pm = ComponentMapper.getFor(PlayerComponent.class);
         this.bodm = ComponentMapper.getFor(B2dBodyComponent.class);
+        this.particleEffectComponentMapper = ComponentMapper.getFor(ParticleEffectComponent.class);
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         B2dBodyComponent b2body = bodm.get(entity);
-        PlayerComponent player = pm.get(entity);
+        PlayerComponent playerComponent = pm.get(entity);
 
-        player.getCamera().position.x = b2body.getBody().getPosition().x;
-        player.getCamera().position.y = b2body.getBody().getPosition().y;
+        playerComponent.getCamera().position.x = b2body.getBody().getPosition().x;
+        playerComponent.getCamera().position.y = b2body.getBody().getPosition().y;
 
         playerMovement.set(0, 0);
 
@@ -72,17 +75,36 @@ public class PlayerControlSystem extends IteratingSystem {
 
         float x = playerMovement.x * PLAYER_SPEED;
         float y = playerMovement.y * PLAYER_SPEED;
-        b2body.getBody().setLinearVelocity(MathUtils.lerp(b2body.getBody().getLinearVelocity().y, x, ACCELERATION), MathUtils.lerp(b2body.getBody().getLinearVelocity().y, y, ACCELERATION));
+        b2body.getBody().setLinearVelocity(MathUtils.lerp(b2body.getBody().getLinearVelocity().x, x, ACCELERATION), MathUtils.lerp(b2body.getBody().getLinearVelocity().y, y, ACCELERATION));
 
 
-        if (player.getTimeSinceLastShot() > 0) {
-            player.setTimeSinceLastShot(player.getTimeSinceLastShot() - deltaTime);
+        if (playerMovement.isZero()) {
+            if(playerComponent.getParticleEffect() != null) {
+                ParticleEffectComponent particleEffectComponent = particleEffectComponentMapper.get(playerComponent.getParticleEffect());
+                if (particleEffectComponent != null) {
+                    particleEffectComponent.particleEffect.getEmitters().forEach(e -> e.allowCompletion());
+                }
+            }
+        } else {
+            if(playerComponent.getParticleEffect() == null) {
+                playerComponent.setParticleEffect(lvlFactory.makeTrail(b2body));
+            } else {
+                ParticleEffectComponent particleEffectComponent = particleEffectComponentMapper.get(playerComponent.getParticleEffect());
+                if (particleEffectComponent == null) {
+                    playerComponent.setParticleEffect(lvlFactory.makeTrail(b2body));
+                }
+            }
+
+        }
+
+        if (playerComponent.getTimeSinceLastShot() > 0) {
+            playerComponent.setTimeSinceLastShot(playerComponent.getTimeSinceLastShot() - deltaTime);
         }
 
         if (controller.isMouse1Down) { // if mouse button is pressed
             // user wants to fire
-            if (player.getTimeSinceLastShot() <= 0) { // check the player hasn't just shot
-                //player can shoot so do player shoot
+            if (playerComponent.getTimeSinceLastShot() <= 0) { // check the playerComponent hasn't just shot
+                //playerComponent can shoot so do playerComponent shoot
                 mousePos.set(controller.mouseLocation.x, controller.mouseLocation.y, 0);
                 viewport.unproject(mousePos);
                 float shooterX = b2body.getBody().getPosition().x;
@@ -93,7 +115,7 @@ public class PlayerControlSystem extends IteratingSystem {
                 bulletMovement.set(mousePos.x - shooterX, mousePos.y - shooterY);
                 bulletMovement.nor();
                 lvlFactory.createBullet(shooterX, shooterY, bulletMovement.x * BULLET_SPEED, bulletMovement.y * BULLET_SPEED);
-                player.setTimeSinceLastShot(player.getShootDelay());
+                playerComponent.setTimeSinceLastShot(playerComponent.getShootDelay());
             }
         }
     }

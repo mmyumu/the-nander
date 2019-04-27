@@ -30,10 +30,10 @@ public class NanderAssetManager {
 
     public final String skin = "skin/glassy-ui.json";
 
-    // Particle Effects
     public final String smokeEffect = "particles/smoke.pe";
     public final String waterEffect = "particles/water.pe";
     public final String fireEffect = "particles/fire.pe";
+    public final String trailEffect = "particles/trail.pe";
 
     public NanderAssetManager() {
         manager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
@@ -45,6 +45,7 @@ public class NanderAssetManager {
         manager.load(smokeEffect, ParticleEffect.class, pep);
         manager.load(waterEffect, ParticleEffect.class, pep);
         manager.load(fireEffect, ParticleEffect.class, pep);
+        manager.load(trailEffect, ParticleEffect.class, pep);
     }
 
     public void queueAddImages() {
