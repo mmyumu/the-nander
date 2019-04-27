@@ -13,6 +13,7 @@ public class ParticleEffectManager {
     public static final int SMOKE = 0;
     public static final int WATER = 1;
     public static final int FIRE = 2;
+    public static final int TRAIL = 3;
 
     private IntMap<ParticleEffectPool> partyEffectPool;
 

@@ -1,5 +1,6 @@
 package com.mmyumu.nander.views;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
@@ -17,6 +18,7 @@ import com.mmyumu.nander.NanderGame;
 import com.mmyumu.nander.controller.KeyboardController;
 import com.mmyumu.nander.entity.components.FPSComponent;
 import com.mmyumu.nander.entity.components.OverlayComponent;
+import com.mmyumu.nander.entity.components.ParticleEffectComponent;
 import com.mmyumu.nander.entity.components.PlayerComponent;
 import com.mmyumu.nander.entity.components.PositionComponent;
 import com.mmyumu.nander.entity.systems.AnimationSystem;
@@ -37,6 +39,7 @@ public class MainScreen implements Screen {
     /* One Plus 6 resolution: 2280*1080 -> ratio=2.11111 */
     private static final int VIEWPORT_WIDTH = 32;
     private static final int VIEWPORT_HEIGHT = 15;
+    private final ComponentMapper<ParticleEffectComponent> particleEffectComponentMapper;
 
     private FitViewport viewport;
     private Entity player;
@@ -109,6 +112,8 @@ public class MainScreen implements Screen {
         engine.addEntity(fpsEntity);
 
         lvlFactory.createMap();
+
+        particleEffectComponentMapper = ComponentMapper.getFor(ParticleEffectComponent.class);
     }
 
 
@@ -127,6 +132,9 @@ public class MainScreen implements Screen {
         //check if player is dead. if so show end screen
         PlayerComponent pc = (player.getComponent(PlayerComponent.class));
         if (pc.isDead()) {
+            if (pc.getParticleEffect() != null) {
+                particleEffectComponentMapper.get(pc.getParticleEffect()).isDead = true;
+            }
             DFUtils.log("YOU DIED : back to menu you go!");
             parent.lastScore = (int) pc.getCamera().position.y;
             parent.changeScreen(NanderGame.ENDGAME);

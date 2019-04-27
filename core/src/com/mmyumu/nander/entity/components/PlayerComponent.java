@@ -1,6 +1,7 @@
 package com.mmyumu.nander.entity.components;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Pool;
 
@@ -11,6 +12,7 @@ public class PlayerComponent implements Component, Pool.Poolable {
     private boolean dead = false;
     private float shootDelay = 0.5f;
     private float timeSinceLastShot = 0f;
+    private Entity particleEffect;
 
     @Override
     public void reset() {
@@ -20,6 +22,7 @@ public class PlayerComponent implements Component, Pool.Poolable {
         dead = false;
         shootDelay = 0.5f;
         timeSinceLastShot = 0f;
+        particleEffect = null;
     }
 
     public OrthographicCamera getCamera() {
@@ -68,5 +71,13 @@ public class PlayerComponent implements Component, Pool.Poolable {
 
     public void setTimeSinceLastShot(float timeSinceLastShot) {
         this.timeSinceLastShot = timeSinceLastShot;
+    }
+
+    public Entity getParticleEffect() {
+        return particleEffect;
+    }
+
+    public void setParticleEffect(Entity particleEffect) {
+        this.particleEffect = particleEffect;
     }
 }
