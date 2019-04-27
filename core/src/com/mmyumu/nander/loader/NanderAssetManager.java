@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.loaders.SkinLoader;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -17,6 +18,10 @@ public class NanderAssetManager {
 
     public final String gameImages = "images/game.atlas";
     public final String loadingImages = "images/loading.atlas";
+
+    public final String characterImage = "images/character1.png";
+    public final String characterImage24 = "images/character24.png";
+    public final String characterImage30 = "images/character30.png";
 
     public final String boingSound = "sounds/boing.wav";
     public final String pingSound = "sounds/ping.wav";
@@ -49,6 +54,9 @@ public class NanderAssetManager {
     // a small set of images used by the loading screen
     public void queueAddLoadingImages() {
         manager.load(loadingImages, TextureAtlas.class);
+        manager.load(characterImage, Texture.class);
+        manager.load(characterImage24, Texture.class);
+        manager.load(characterImage30, Texture.class);
     }
 
     public void queueAddSounds() {
