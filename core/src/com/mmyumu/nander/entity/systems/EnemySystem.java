@@ -25,7 +25,7 @@ public class EnemySystem extends IteratingSystem {
         B2dBodyComponent bodyCom = bodm.get(entity);    // get B2dBodyComponent
 
         // get distance of enemy from its original start position (pad center)
-        float distFromOrig = Math.abs(enemyCom.xPosCenter - bodyCom.getBody().getPosition().x);
+        float distFromOrig = Math.abs(enemyCom.xPosCenter - bodyCom.body.getPosition().x);
 
         // if distance > 1 swap direction
         enemyCom.isGoingLeft = (distFromOrig > 1) ? !enemyCom.isGoingLeft : enemyCom.isGoingLeft;
@@ -34,13 +34,13 @@ public class EnemySystem extends IteratingSystem {
         float speed = enemyCom.isGoingLeft ? -0.01f : 0.01f;
 
         // apply speed to body
-        bodyCom.getBody().setTransform(bodyCom.getBody().getPosition().x + speed,
-                bodyCom.getBody().getPosition().y,
-                bodyCom.getBody().getAngle());
+        bodyCom.body.setTransform(bodyCom.body.getPosition().x + speed,
+                bodyCom.body.getPosition().y,
+                bodyCom.body.getAngle());
 
         // check for dead enemies
-        if (enemyCom.isDead) {
-            bodyCom.setDead(true);
+        if (enemyCom.dead) {
+            bodyCom.dead = true;
         }
     }
 }

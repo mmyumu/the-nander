@@ -30,11 +30,11 @@ public class NanderContactListener implements ContactListener {
             CollisionComponent colB = entityB.getComponent(CollisionComponent.class);
 
             if (colA != null) {
-                colA.getCollisionEntities().add(entityB);
+                colA.collisionEntities.add(entityB);
                 System.out.println("Collision between " + colA + " and " + entityB);
             }
             if (colB != null) {
-                colB.getCollisionEntities().add(entityA);
+                colB.collisionEntities.add(entityA);
                 System.out.println("Collision between " + colB + " and " + entityA);
             }
         }

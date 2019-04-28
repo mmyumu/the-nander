@@ -52,8 +52,8 @@ public class PlayerControlSystem extends IteratingSystem {
         B2dBodyComponent b2body = bodm.get(entity);
         PlayerComponent playerComponent = pm.get(entity);
 
-        playerComponent.getCamera().position.x = b2body.getBody().getPosition().x;
-        playerComponent.getCamera().position.y = b2body.getBody().getPosition().y;
+        playerComponent.camera.position.x = b2body.body.getPosition().x;
+        playerComponent.camera.position.y = b2body.body.getPosition().y;
 
         playerMovement.set(0, 0);
 
@@ -75,47 +75,47 @@ public class PlayerControlSystem extends IteratingSystem {
 
         float x = playerMovement.x * PLAYER_SPEED;
         float y = playerMovement.y * PLAYER_SPEED;
-        b2body.getBody().setLinearVelocity(MathUtils.lerp(b2body.getBody().getLinearVelocity().x, x, ACCELERATION), MathUtils.lerp(b2body.getBody().getLinearVelocity().y, y, ACCELERATION));
+        b2body.body.setLinearVelocity(MathUtils.lerp(b2body.body.getLinearVelocity().x, x, ACCELERATION), MathUtils.lerp(b2body.body.getLinearVelocity().y, y, ACCELERATION));
 
 
         if (playerMovement.isZero()) {
-            if(playerComponent.getParticleEffect() != null) {
-                ParticleEffectComponent particleEffectComponent = particleEffectComponentMapper.get(playerComponent.getParticleEffect());
+            if(playerComponent.particleEffect != null) {
+                ParticleEffectComponent particleEffectComponent = particleEffectComponentMapper.get(playerComponent.particleEffect);
                 if (particleEffectComponent != null) {
                     particleEffectComponent.particleEffect.getEmitters().forEach(e -> e.allowCompletion());
                 }
             }
         } else {
-            if(playerComponent.getParticleEffect() == null) {
-                playerComponent.setParticleEffect(lvlFactory.makeTrail(b2body));
+            if(playerComponent.particleEffect == null) {
+                playerComponent.particleEffect = lvlFactory.makeTrail(b2body);
             } else {
-                ParticleEffectComponent particleEffectComponent = particleEffectComponentMapper.get(playerComponent.getParticleEffect());
+                ParticleEffectComponent particleEffectComponent = particleEffectComponentMapper.get(playerComponent.particleEffect);
                 if (particleEffectComponent == null) {
-                    playerComponent.setParticleEffect(lvlFactory.makeTrail(b2body));
+                    playerComponent.particleEffect = lvlFactory.makeTrail(b2body);
                 }
             }
 
         }
 
-        if (playerComponent.getTimeSinceLastShot() > 0) {
-            playerComponent.setTimeSinceLastShot(playerComponent.getTimeSinceLastShot() - deltaTime);
+        if (playerComponent.timeSinceLastShot> 0) {
+            playerComponent.timeSinceLastShot = playerComponent.timeSinceLastShot - deltaTime;
         }
 
         if (controller.isMouse1Down) { // if mouse button is pressed
             // user wants to fire
-            if (playerComponent.getTimeSinceLastShot() <= 0) { // check the playerComponent hasn't just shot
+            if (playerComponent.timeSinceLastShot <= 0) { // check the playerComponent hasn't just shot
                 //playerComponent can shoot so do playerComponent shoot
                 mousePos.set(controller.mouseLocation.x, controller.mouseLocation.y, 0);
                 viewport.unproject(mousePos);
-                float shooterX = b2body.getBody().getPosition().x;
-                float shooterY = b2body.getBody().getPosition().y;
+                float shooterX = b2body.body.getPosition().x;
+                float shooterY = b2body.body.getPosition().y;
 
                 System.out.println("Player x=" + shooterX + ", y=" + shooterY + " Mouse x=" + mousePos.x + ", y=" + mousePos.y);
 
                 bulletMovement.set(mousePos.x - shooterX, mousePos.y - shooterY);
                 bulletMovement.nor();
                 lvlFactory.createBullet(shooterX, shooterY, bulletMovement.x * BULLET_SPEED, bulletMovement.y * BULLET_SPEED);
-                playerComponent.setTimeSinceLastShot(playerComponent.getShootDelay());
+                playerComponent.timeSinceLastShot = playerComponent.shootDelay;
             }
         }
     }

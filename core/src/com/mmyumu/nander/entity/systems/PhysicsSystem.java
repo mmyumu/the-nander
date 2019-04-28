@@ -51,15 +51,15 @@ public class PhysicsSystem extends IteratingSystem {
                 PositionComponent positionComponent = positionComponentMapper.get(entity);
 
                 B2dBodyComponent bodyComponent = b2dBodyComponentMapper.get(entity);
-                Vector2 position = bodyComponent.getBody().getPosition();
+                Vector2 position = bodyComponent.body.getPosition();
 //                System.out.println("Entity " + entity + " [before set from body] x=" + positionComponent.getX() + ", y=" + positionComponent.getY());
-                positionComponent.setX(position.x);
-                positionComponent.setY(position.y);
+                positionComponent.x = position.x;
+                positionComponent.y = position.y;
 //                System.out.println("Entity " + entity + "  [after set from body] x=" + positionComponent.getX() + ", y=" + positionComponent.getY());
-                transformComponent.setRotation(bodyComponent.getBody().getAngle() * MathUtils.radiansToDegrees);
-                if (bodyComponent.isDead()) {
+                transformComponent.rotation = bodyComponent.body.getAngle() * MathUtils.radiansToDegrees;
+                if (bodyComponent.dead) {
                     System.out.println("Removing a body and entity");
-                    world.destroyBody(bodyComponent.getBody());
+                    world.destroyBody(bodyComponent.body);
                     getEngine().removeEntity(entity);
                 }
             }

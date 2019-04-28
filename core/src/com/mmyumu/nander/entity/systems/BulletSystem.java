@@ -33,30 +33,30 @@ public class BulletSystem extends IteratingSystem {
         BulletComponent bullet = bulletComponentMapper.get(entity);
 
         // apply bullet velocity to bullet body
-        b2body.getBody().setLinearVelocity(bullet.xVel, bullet.yVel);
+        b2body.body.setLinearVelocity(bullet.xVel, bullet.yVel);
 
         // get player pos
         B2dBodyComponent playerBodyComp = b2dBodyComponentMapper.get(lvlFactory.player);
-        float px = playerBodyComp.getBody().getPosition().x;
-        float py = playerBodyComp.getBody().getPosition().y;
+        float px = playerBodyComp.body.getPosition().x;
+        float py = playerBodyComp.body.getPosition().y;
 
         //get bullet pos
-        float bx = b2body.getBody().getPosition().x;
-        float by = b2body.getBody().getPosition().y;
+        float bx = b2body.body.getPosition().x;
+        float by = b2body.body.getPosition().y;
 
         // if bullet is 20 units away from player on any axis then it is probably off screen
         if (bx - px > 20 || by - py > 20) {
-            bullet.isDead = true;
+            bullet.dead = true;
         }
 
         //check if bullet is dead
-        if (bullet.isDead) {
+        if (bullet.dead) {
             System.out.println("Bullet died");
             if (bullet.particleEffect != null) {
                 particleEffectComponentMapper.get(bullet.particleEffect).isDead = true;
             }
 
-            b2body.setDead(true);
+            b2body.dead = true;
         }
     }
 }

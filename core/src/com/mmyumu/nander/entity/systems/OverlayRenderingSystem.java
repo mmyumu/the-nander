@@ -42,7 +42,7 @@ public class OverlayRenderingSystem extends IteratingSystem {
             for (Entity entity : renderQueue) {
                 OverlayComponent overlayComponent = entity.getComponent(OverlayComponent.class);
 //                font.draw(batch, overlayComponent.getText(), overlayComponent.getX(), 10);
-                System.out.println(overlayComponent.getText());
+                System.out.println(overlayComponent.text);
             }
 
             renderQueue.clear();

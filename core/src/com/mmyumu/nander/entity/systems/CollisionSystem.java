@@ -35,7 +35,7 @@ public class CollisionSystem extends IteratingSystem {
         // get collision for this entity
         CollisionComponent collisionComponent = collisionComponentMapper.get(entity);
         //get collided entity
-        List<Entity> collidedEntities = collisionComponent.getCollisionEntities();
+        List<Entity> collidedEntities = collisionComponent.collisionEntities;
 
 
         TypeComponent thisType = typeComponentMapper.get(entity);
@@ -51,18 +51,18 @@ public class CollisionSystem extends IteratingSystem {
                                 //do player hit enemy thing
                                 System.out.println("player hit enemy");
                                 PlayerComponent pl = playerComponentMapper.get(entity);
-                                pl.setDead(true);
-                                int score = (int) pl.getCamera().position.y;
+                                pl.dead = true;
+                                int score = (int) pl.camera.position.y;
                                 System.out.println("Score = " + score);
                                 break;
                             case TypeComponent.SCENERY:
                                 //do player hit scenery thing
-                                playerComponentMapper.get(entity).setOnPlatform(true);
+                                playerComponentMapper.get(entity).onPlatform = true;
                                 System.out.println("player hit scenery");
                                 break;
                             case TypeComponent.SPRING:
                                 //do player hit other thing
-                                playerComponentMapper.get(entity).setOnSpring(true);
+                                playerComponentMapper.get(entity).onSpring = true;
                                 System.out.println("player hit spring: bounce up");
                                 break;
                             case TypeComponent.OTHER:
@@ -77,7 +77,7 @@ public class CollisionSystem extends IteratingSystem {
                         }
                     }
                 }
-                collisionComponent.getCollisionEntities().clear(); // collision handled reset component
+                collisionComponent.collisionEntities.clear(); // collision handled reset component
             }
         } else if (thisType.type == TypeComponent.ENEMY) {    // Do enemy collisions
             if (!collidedEntities.isEmpty()) {
@@ -102,9 +102,9 @@ public class CollisionSystem extends IteratingSystem {
                                 break;
                             case TypeComponent.BULLET:
                                 EnemyComponent enemy = enemyComponentMapper.get(entity);
-                                enemy.isDead = true;
+                                enemy.dead = true;
                                 BulletComponent bullet = bulletComponentMapper.get(collidedEntity);
-                                bullet.isDead = true;
+                                bullet.dead = true;
                                 System.out.println("enemy got shot");
                                 break;
                             default:
@@ -112,7 +112,7 @@ public class CollisionSystem extends IteratingSystem {
                         }
                     }
                 }
-                collisionComponent.getCollisionEntities().clear(); // collision handled reset component
+                collisionComponent.collisionEntities.clear(); // collision handled reset component
             }
         }
     }

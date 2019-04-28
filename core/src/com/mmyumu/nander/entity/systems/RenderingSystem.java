@@ -122,7 +122,7 @@ public class RenderingSystem extends SortedIteratingSystem {
             TransformComponent transformComponent = transformComponentMapper.get(entity);
 
 
-            if (textureComponent.region == null || transformComponent.isHidden()) {
+            if (textureComponent.region == null || transformComponent.hidden) {
                 continue;
             }
 
@@ -134,11 +134,11 @@ public class RenderingSystem extends SortedIteratingSystem {
             float originY = height / 2f;
 
             batch.draw(textureComponent.region,
-                    positionComponent.getX() - originX, positionComponent.getY() - originY,
+                    positionComponent.x - originX, positionComponent.y - originY,
                     originX, originY,
                     width, height,
-                    PixelsToMeters(transformComponent.getScale().x), PixelsToMeters(transformComponent.getScale().y),
-                    transformComponent.getRotation());
+                    PixelsToMeters(transformComponent.scale.x), PixelsToMeters(transformComponent.scale.y),
+                    transformComponent.rotation);
 //            System.out.println("Draw entity " + entity + " to x=" + positionComponent.getX() + ", y=" + positionComponent.getY());
         }
         renderQueue.clear();
@@ -154,7 +154,7 @@ public class RenderingSystem extends SortedIteratingSystem {
             OverlayComponent overlayComponent = overlayComponentMapper.get(entity);
 
             // TODO: use positionComponent.getY()
-            font.draw(hudBatch, overlayComponent.getText(), positionComponent.getX(), positionComponent.getY());
+            font.draw(hudBatch, overlayComponent.text, positionComponent.x, positionComponent.y);
 //            font.draw(hudBatch, overlayComponent.getText(), 10, 10);
 //            System.out.println("Draw overlay to x=" + positionComponent.getX() + ", y=" + positionComponent.getY());
         }
@@ -175,9 +175,9 @@ public class RenderingSystem extends SortedIteratingSystem {
             overlayRenderQueue.add(entity);
         } else if (tiledMapComponent != null) {
             TiledMapComponent component = entity.getComponent(TiledMapComponent.class);
-            mapRenderer = component.getMapRenderer();
-            backgroundLayers = component.getBackgroundLayers();
-            foregroundLayers = component.getForegroundLayers();
+            mapRenderer = component.mapRenderer;
+            backgroundLayers = component.backgroundLayers;
+            foregroundLayers = component.foregroundLayers;
         } else if (textureComponent != null && transformComponent != null) {
             renderQueue.add(entity);
         }

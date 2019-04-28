@@ -101,9 +101,9 @@ public class MainScreen implements Screen {
 
         OverlayComponent overlayComponent = new OverlayComponent();
         PositionComponent positionComponent = new PositionComponent();
-        positionComponent.setX(10f);
-        positionComponent.setY(Gdx.graphics.getHeight() - 10f);
-        positionComponent.setZ(0f);
+        positionComponent.x = 10f;
+        positionComponent.y = Gdx.graphics.getHeight() - 10f;
+        positionComponent.z = 0f;
 
         Entity fpsEntity = engine.createEntity();
         fpsEntity.add(new FPSComponent());
@@ -131,12 +131,12 @@ public class MainScreen implements Screen {
 
         //check if player is dead. if so show end screen
         PlayerComponent pc = (player.getComponent(PlayerComponent.class));
-        if (pc.isDead()) {
-            if (pc.getParticleEffect() != null) {
-                particleEffectComponentMapper.get(pc.getParticleEffect()).isDead = true;
+        if (pc.dead) {
+            if (pc.particleEffect != null) {
+                particleEffectComponentMapper.get(pc.particleEffect).isDead = true;
             }
             DFUtils.log("YOU DIED : back to menu you go!");
-            parent.lastScore = (int) pc.getCamera().position.y;
+            parent.lastScore = (int) pc.camera.position.y;
             parent.changeScreen(NanderGame.ENDGAME);
         }
     }

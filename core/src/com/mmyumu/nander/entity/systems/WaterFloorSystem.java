@@ -23,8 +23,8 @@ public class WaterFloorSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        float currentyLevel = b2dBodyComponentMapper.get(lvlFactory.player).getBody().getPosition().y;
-        Body body = b2dBodyComponentMapper.get(entity).getBody();
+        float currentyLevel = b2dBodyComponentMapper.get(lvlFactory.player).body.getPosition().y;
+        Body body = b2dBodyComponentMapper.get(entity).body;
 
         float speed = (currentyLevel / 1000);
 

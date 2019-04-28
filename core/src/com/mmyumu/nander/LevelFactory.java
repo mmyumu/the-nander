@@ -86,9 +86,9 @@ public class LevelFactory {
         TypeComponent type = engine.createComponent(TypeComponent.class);
         StateComponent stateCom = engine.createComponent(StateComponent.class);
         PositionComponent positionComponent = engine.createComponent(PositionComponent.class);
-        positionComponent.setX(1f);
-        positionComponent.setY(1f);
-        positionComponent.setZ(0f);
+        positionComponent.x = 1f;
+        positionComponent.y = 1f;
+        positionComponent.z = 0f;
 
 //        textureComponent.region = playerTex;
 //        textureComponent.region = new TextureRegion(assetManager.manager.get("images/character1.png", Texture.class));
@@ -96,21 +96,22 @@ public class LevelFactory {
         textureComponent.region = new TextureRegion(assetManager.manager.get("images/character30.png", Texture.class));
 //        textureComponent.region.setRegionHeight(32);
 //        textureComponent.region.setRegionWidth(32);
-        transformComponent.setScale(2f, 2f);
+        transformComponent.scale.x = 2f;
+        transformComponent.scale.y = 2f;
 
-        playerComponent.setCamera(camera);
-        b2dbody.setBody(bodyFactory.makeBoxPolyBody(
-                positionComponent.getX(),
-                positionComponent.getY(),
+        playerComponent.camera = camera;
+        b2dbody.body = bodyFactory.makeBoxPolyBody(
+                positionComponent.x,
+                positionComponent.y,
                 1.875f,
                 1.875f,
                 BodyFactory.STONE,
                 BodyType.DynamicBody,
-                true));
+                true);
 
         type.type = TypeComponent.PLAYER;
         stateCom.set(StateComponent.STATE_NORMAL);
-        b2dbody.getBody().setUserData(entity);
+        b2dbody.body.setUserData(entity);
 
         entity.add(b2dbody);
         entity.add(transformComponent);
@@ -143,10 +144,10 @@ public class LevelFactory {
             PositionComponent positionComponent = engine.createComponent(PositionComponent.class);
 
             //make wall
-            b2dbody.setBody(bodyFactory.makeBoxPolyBody(i * 40, 30, 1, 60, BodyFactory.STONE, BodyType.KinematicBody, true));
-            positionComponent.setX(i * 40f);
-            positionComponent.setY(30f);
-            positionComponent.setZ(0f);
+            b2dbody.body = bodyFactory.makeBoxPolyBody(i * 40, 30, 1, 60, BodyFactory.STONE, BodyType.KinematicBody, true);
+            positionComponent.x = i * 40f;
+            positionComponent.y = 30f;
+            positionComponent.z = 0f;
             texture.region = tex;
             type.type = TypeComponent.SCENERY;
 
@@ -156,7 +157,7 @@ public class LevelFactory {
             entity.add(type);
             entity.add(wallComp);
             entity.add(positionComponent);
-            b2dbody.getBody().setUserData(entity);
+            b2dbody.body.setUserData(entity);
 
             engine.addEntity(entity);
         }
@@ -176,19 +177,19 @@ public class LevelFactory {
         PositionComponent positionComponent = engine.createComponent(PositionComponent.class);
 
 
-        b2dbody.setBody(bodyFactory.makeCirclePolyBody(x, y, 0.5f, BodyFactory.STONE, BodyType.DynamicBody, true));
-        b2dbody.getBody().setBullet(true); // increase physics computation to limit body travelling through other objects
-        bodyFactory.makeAllFixturesSensors(b2dbody.getBody()); // make bullets sensors so they don't move player
-        positionComponent.setX(x);
-        positionComponent.setY(y);
-        positionComponent.setZ(0f);
+        b2dbody.body = bodyFactory.makeCirclePolyBody(x, y, 0.5f, BodyFactory.STONE, BodyType.DynamicBody, true);
+        b2dbody.body.setBullet(true); // increase physics computation to limit body travelling through other objects
+        bodyFactory.makeAllFixturesSensors(b2dbody.body); // make bullets sensors so they don't move player
+        positionComponent.x = x;
+        positionComponent.y = y;
+        positionComponent.z = 0f;
         texture.region = bulletTex;
         Animation anim = new Animation(0.05f, DFUtils.spriteSheetToFrames(atlas.findRegion("FlameSpriteAnimation"), 7, 1));
         anim.setPlayMode(Animation.PlayMode.LOOP);
         animCom.animations.put(0, anim);
 
         type.type = TypeComponent.BULLET;
-        b2dbody.getBody().setUserData(entity);
+        b2dbody.body.setUserData(entity);
         bul.xVel = xVel;
         bul.yVel = yVel;
 
@@ -229,9 +230,9 @@ public class LevelFactory {
         }
 
         TiledMapComponent mapComponent = engine.createComponent(TiledMapComponent.class);
-        mapComponent.setMapRenderer(new OrthoCachedTiledMapRenderer(map, TILED_MAP_RATIO));
-        mapComponent.setBackgroundLayers(new int[]{map.getLayers().getIndex(BACKGROUND_LAYER_NAME)});
-        mapComponent.setForegroundLayers(new int[]{map.getLayers().getIndex(FOREGROUND_LAYER_NAME)});
+        mapComponent.mapRenderer = new OrthoCachedTiledMapRenderer(map, TILED_MAP_RATIO);
+        mapComponent.backgroundLayers = new int[]{map.getLayers().getIndex(BACKGROUND_LAYER_NAME)};
+        mapComponent.foregroundLayers = new int[]{map.getLayers().getIndex(FOREGROUND_LAYER_NAME)};
 
         entity.add(mapComponent);
         engine.addEntity(entity);
@@ -367,13 +368,13 @@ public class LevelFactory {
         Entity entPE = engine.createEntity();
         ParticleEffectComponent pec = engine.createComponent(ParticleEffectComponent.class);
         pec.particleEffect = pem.getPooledParticleEffect(type);
-        pec.particleEffect.setPosition(b2dbody.getBody().getPosition().x, b2dbody.getBody().getPosition().y);
+        pec.particleEffect.setPosition(b2dbody.body.getPosition().x, b2dbody.body.getPosition().y);
         pec.isattached = true;
         for (ParticleEmitter emitter : pec.particleEffect.getEmitters()) {
             emitter.setContinuous(true);
         }
 
-        pec.attachedBody = b2dbody.getBody();
+        pec.attachedBody = b2dbody.body;
         pec.xOffset = xOffset;
         pec.yOffset = yOffset;
 

@@ -8,13 +8,13 @@ public class BulletComponent implements Component, Poolable{
     public Entity particleEffect;
     public float xVel = 0;
     public float yVel = 0;
-    public boolean isDead = false;
+    public boolean dead = false;
 
     @Override
     public void reset() {
         xVel = 0;
         yVel = 0;
-        isDead = false;
+        dead = false;
         particleEffect = null;
     }
 }

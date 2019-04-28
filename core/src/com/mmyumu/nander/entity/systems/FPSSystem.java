@@ -15,6 +15,6 @@ public class FPSSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         OverlayComponent overlayComponent = entity.getComponent(OverlayComponent.class);
-        overlayComponent.setText("FPS: " + Gdx.graphics.getFramesPerSecond() + " fps");
+        overlayComponent.text = "FPS: " + Gdx.graphics.getFramesPerSecond() + " fps";
     }
 }
