@@ -11,16 +11,14 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mmyumu.nander.DFUtils;
 import com.mmyumu.nander.LevelFactory;
 import com.mmyumu.nander.NanderGame;
 import com.mmyumu.nander.controller.KeyboardController;
-import com.mmyumu.nander.entity.components.FPSComponent;
-import com.mmyumu.nander.entity.components.OverlayComponent;
 import com.mmyumu.nander.entity.components.ParticleEffectComponent;
 import com.mmyumu.nander.entity.components.PlayerComponent;
-import com.mmyumu.nander.entity.components.PositionComponent;
 import com.mmyumu.nander.entity.systems.AnimationSystem;
 import com.mmyumu.nander.entity.systems.BulletSystem;
 import com.mmyumu.nander.entity.systems.CollisionSystem;
@@ -36,13 +34,15 @@ import com.mmyumu.nander.entity.systems.WaterFloorSystem;
 
 
 public class MainScreen implements Screen {
-    /* One Plus 6 resolution: 2280*1080 -> ratio=2.11111 */
+    /** One Plus 6 resolution: 2280*1080 -> ratio=2.11111 **/
     private static final int VIEWPORT_WIDTH = 32;
     private static final int VIEWPORT_HEIGHT = 15;
     private final ComponentMapper<ParticleEffectComponent> particleEffectComponentMapper;
 
+
     private FitViewport viewport;
     private Entity player;
+    private TiledMap map;
     private NanderGame parent;
     private OrthographicCamera camera;
     private KeyboardController controller;
@@ -67,51 +67,37 @@ public class MainScreen implements Screen {
         boing = parent.assetManager.manager.get("sounds/boing.wav", Sound.class);
         controller = new KeyboardController();
         engine = new PooledEngine();
-        lvlFactory = new LevelFactory(engine, parent.assetManager);
 
 
         spriteBatch = new SpriteBatch();
+
         RenderingSystem renderingSystem = new RenderingSystem(spriteBatch);
         camera = renderingSystem.getCamera();
+
         viewport = new FitViewport(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, camera);
         viewport.getCamera().update();
+
         ParticleEffectSystem particleSystem = new ParticleEffectSystem(spriteBatch, camera);
+
         spriteBatch.setProjectionMatrix(camera.combined);
 
-
+        lvlFactory = new LevelFactory(engine, parent.assetManager);
+        lvlFactory.createMap();
+        player = lvlFactory.createPlayer(camera);
+        lvlFactory.createFPS();
 
         engine.addSystem(new AnimationSystem());
-
         engine.addSystem(new FPSSystem());
-//        engine.addSystem(mapRenderingSystem);
         engine.addSystem(renderingSystem);
         engine.addSystem(new PhysicsDebugSystem(lvlFactory.world, renderingSystem.getCamera()));
         engine.addSystem(particleSystem);
-//        engine.addSystem(overlayRenderingSystem);
         engine.addSystem(new PhysicsSystem(lvlFactory.world));
-
         engine.addSystem(new CollisionSystem());
         engine.addSystem(new PlayerControlSystem(controller, lvlFactory, viewport));
         engine.addSystem(new EnemySystem());
-        player = lvlFactory.createPlayer(camera);
         engine.addSystem(new WallSystem(lvlFactory));
         engine.addSystem(new WaterFloorSystem(lvlFactory));
         engine.addSystem(new BulletSystem(lvlFactory));
-
-
-        OverlayComponent overlayComponent = new OverlayComponent();
-        PositionComponent positionComponent = new PositionComponent();
-        positionComponent.x = 10f;
-        positionComponent.y = Gdx.graphics.getHeight() - 10f;
-        positionComponent.z = 0f;
-
-        Entity fpsEntity = engine.createEntity();
-        fpsEntity.add(new FPSComponent());
-        fpsEntity.add(overlayComponent);
-        fpsEntity.add(positionComponent);
-        engine.addEntity(fpsEntity);
-
-        lvlFactory.createMap();
 
         particleEffectComponentMapper = ComponentMapper.getFor(ParticleEffectComponent.class);
     }
@@ -168,6 +154,7 @@ public class MainScreen implements Screen {
         engine.removeAllEntities();
         lvlFactory.resetWorld();
 
+        lvlFactory.createMap();
         player = lvlFactory.createPlayer(camera);
 
         int wallWidth = (int) (1 * RenderingSystem.PPM);
