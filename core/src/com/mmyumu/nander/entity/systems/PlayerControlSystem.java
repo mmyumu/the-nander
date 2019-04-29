@@ -13,6 +13,7 @@ import com.mmyumu.nander.controller.KeyboardController;
 import com.mmyumu.nander.entity.components.B2dBodyComponent;
 import com.mmyumu.nander.entity.components.ParticleEffectComponent;
 import com.mmyumu.nander.entity.components.PlayerComponent;
+import com.mmyumu.nander.entity.components.ZComponent;
 
 public class PlayerControlSystem extends IteratingSystem {
     private static final float BULLET_SPEED = 10f;
@@ -23,6 +24,7 @@ public class PlayerControlSystem extends IteratingSystem {
     private final ComponentMapper<B2dBodyComponent> bodm;
     private final KeyboardController controller;
     private final ComponentMapper<ParticleEffectComponent> particleEffectComponentMapper;
+    private final ComponentMapper<ZComponent> zComponentMapper;
     private LevelFactory lvlFactory;
     private Viewport viewport;
 
@@ -45,6 +47,7 @@ public class PlayerControlSystem extends IteratingSystem {
         this.pm = ComponentMapper.getFor(PlayerComponent.class);
         this.bodm = ComponentMapper.getFor(B2dBodyComponent.class);
         this.particleEffectComponentMapper = ComponentMapper.getFor(ParticleEffectComponent.class);
+        this.zComponentMapper = ComponentMapper.getFor(ZComponent.class);
     }
 
     @Override
@@ -65,6 +68,7 @@ public class PlayerControlSystem extends IteratingSystem {
         }
         if (controller.up) {
             playerMovement.y += 1;
+
         }
         if (controller.down) {
             playerMovement.y -= 1;
@@ -77,16 +81,16 @@ public class PlayerControlSystem extends IteratingSystem {
         float y = playerMovement.y * PLAYER_SPEED;
         b2body.body.setLinearVelocity(MathUtils.lerp(b2body.body.getLinearVelocity().x, x, ACCELERATION), MathUtils.lerp(b2body.body.getLinearVelocity().y, y, ACCELERATION));
 
-
+        // Create trail particle if needed
         if (playerMovement.isZero()) {
-            if(playerComponent.particleEffect != null) {
+            if (playerComponent.particleEffect != null) {
                 ParticleEffectComponent particleEffectComponent = particleEffectComponentMapper.get(playerComponent.particleEffect);
                 if (particleEffectComponent != null) {
                     particleEffectComponent.particleEffect.getEmitters().forEach(e -> e.allowCompletion());
                 }
             }
         } else {
-            if(playerComponent.particleEffect == null) {
+            if (playerComponent.particleEffect == null) {
                 playerComponent.particleEffect = lvlFactory.makeTrail(b2body);
             } else {
                 ParticleEffectComponent particleEffectComponent = particleEffectComponentMapper.get(playerComponent.particleEffect);
@@ -94,10 +98,22 @@ public class PlayerControlSystem extends IteratingSystem {
                     playerComponent.particleEffect = lvlFactory.makeTrail(b2body);
                 }
             }
-
         }
 
-        if (playerComponent.timeSinceLastShot> 0) {
+        // Setup the Z for the trail
+        if (playerComponent.particleEffect != null) {
+            ZComponent zComponent = zComponentMapper.get(playerComponent.particleEffect);
+            if (zComponent != null) {
+                if (controller.up) {
+                    zComponent.z = 15f;
+                } else if (!playerMovement.isZero()) {
+                    zComponent.z = 5f;
+                }
+            }
+        }
+
+
+        if (playerComponent.timeSinceLastShot > 0) {
             playerComponent.timeSinceLastShot = playerComponent.timeSinceLastShot - deltaTime;
         }
 

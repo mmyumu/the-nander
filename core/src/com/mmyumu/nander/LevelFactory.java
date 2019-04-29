@@ -2,6 +2,7 @@ package com.mmyumu.nander;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -27,15 +28,19 @@ import com.mmyumu.nander.entity.components.AnimationComponent;
 import com.mmyumu.nander.entity.components.B2dBodyComponent;
 import com.mmyumu.nander.entity.components.BulletComponent;
 import com.mmyumu.nander.entity.components.CollisionComponent;
+import com.mmyumu.nander.entity.components.FPSComponent;
+import com.mmyumu.nander.entity.components.OverlayComponent;
 import com.mmyumu.nander.entity.components.ParticleEffectComponent;
 import com.mmyumu.nander.entity.components.PlayerComponent;
 import com.mmyumu.nander.entity.components.PositionComponent;
+import com.mmyumu.nander.entity.components.RenderingComponent;
 import com.mmyumu.nander.entity.components.StateComponent;
 import com.mmyumu.nander.entity.components.TextureComponent;
 import com.mmyumu.nander.entity.components.TiledMapComponent;
 import com.mmyumu.nander.entity.components.TransformComponent;
 import com.mmyumu.nander.entity.components.TypeComponent;
 import com.mmyumu.nander.entity.components.WallComponent;
+import com.mmyumu.nander.entity.components.ZComponent;
 import com.mmyumu.nander.loader.NanderAssetManager;
 
 import java.util.ArrayList;
@@ -88,7 +93,6 @@ public class LevelFactory {
         PositionComponent positionComponent = engine.createComponent(PositionComponent.class);
         positionComponent.x = 1f;
         positionComponent.y = 1f;
-        positionComponent.z = 0f;
 
 //        textureComponent.region = playerTex;
 //        textureComponent.region = new TextureRegion(assetManager.manager.get("images/character1.png", Texture.class));
@@ -113,6 +117,12 @@ public class LevelFactory {
         stateCom.set(StateComponent.STATE_NORMAL);
         b2dbody.body.setUserData(entity);
 
+        RenderingComponent renderingComponent = engine.createComponent(RenderingComponent.class);
+        renderingComponent.renderingType = RenderingComponent.RenderingType.OBJECTS;
+
+        ZComponent zComponent = engine.createComponent(ZComponent.class);
+        zComponent.z = 10f;
+
         entity.add(b2dbody);
         entity.add(transformComponent);
         entity.add(playerComponent);
@@ -121,14 +131,13 @@ public class LevelFactory {
         entity.add(stateCom);
         entity.add(positionComponent);
         entity.add(textureComponent);
+        entity.add(renderingComponent);
+        entity.add(zComponent);
+
 
         engine.addEntity(entity);
         this.player = entity;
         return entity;
-    }
-
-    public Entity makeTrail(B2dBodyComponent b2dbody) {
-        return makeParticleEffect(ParticleEffectManager.TRAIL, b2dbody);
     }
 
     public void createWalls(TextureRegion tex) {
@@ -147,7 +156,6 @@ public class LevelFactory {
             b2dbody.body = bodyFactory.makeBoxPolyBody(i * 40, 30, 1, 60, BodyFactory.STONE, BodyType.KinematicBody, true);
             positionComponent.x = i * 40f;
             positionComponent.y = 30f;
-            positionComponent.z = 0f;
             texture.region = tex;
             type.type = TypeComponent.SCENERY;
 
@@ -182,7 +190,6 @@ public class LevelFactory {
         bodyFactory.makeAllFixturesSensors(b2dbody.body); // make bullets sensors so they don't move player
         positionComponent.x = x;
         positionComponent.y = y;
-        positionComponent.z = 0f;
         texture.region = bulletTex;
         Animation anim = new Animation(0.05f, DFUtils.spriteSheetToFrames(atlas.findRegion("FlameSpriteAnimation"), 7, 1));
         anim.setPlayMode(Animation.PlayMode.LOOP);
@@ -210,6 +217,23 @@ public class LevelFactory {
         return entity;
     }
 
+    public void createFPS() {
+        OverlayComponent overlayComponent = new OverlayComponent();
+        PositionComponent positionComponent = new PositionComponent();
+        positionComponent.x = 10f;
+        positionComponent.y = Gdx.graphics.getHeight() - 10f;
+
+        RenderingComponent renderingComponent = engine.createComponent(RenderingComponent.class);
+        renderingComponent.renderingType = RenderingComponent.RenderingType.OVERLAY;
+
+        Entity fpsEntity = engine.createEntity();
+        fpsEntity.add(new FPSComponent());
+        fpsEntity.add(overlayComponent);
+        fpsEntity.add(renderingComponent);
+        fpsEntity.add(positionComponent);
+        engine.addEntity(fpsEntity);
+    }
+
     /**
      * Create the map entity
      *
@@ -234,7 +258,11 @@ public class LevelFactory {
         mapComponent.backgroundLayers = new int[]{map.getLayers().getIndex(BACKGROUND_LAYER_NAME)};
         mapComponent.foregroundLayers = new int[]{map.getLayers().getIndex(FOREGROUND_LAYER_NAME)};
 
+        RenderingComponent renderingComponent = engine.createComponent(RenderingComponent.class);
+        renderingComponent.renderingType = RenderingComponent.RenderingType.MAP;
+
         entity.add(mapComponent);
+        entity.add(renderingComponent);
         engine.addEntity(entity);
         return entity;
     }
@@ -344,6 +372,10 @@ public class LevelFactory {
         return entPE;
     }
 
+    public Entity makeTrail(B2dBodyComponent b2dbody) {
+        return makeParticleEffect(ParticleEffectManager.TRAIL, b2dbody);
+    }
+
     /**
      * Attache particle effect to body from body component
      *
@@ -365,23 +397,34 @@ public class LevelFactory {
      * @return the Particle Effect Entity
      */
     public Entity makeParticleEffect(int type, B2dBodyComponent b2dbody, float xOffset, float yOffset) {
-        Entity entPE = engine.createEntity();
-        ParticleEffectComponent pec = engine.createComponent(ParticleEffectComponent.class);
-        pec.particleEffect = pem.getPooledParticleEffect(type);
-        pec.particleEffect.setPosition(b2dbody.body.getPosition().x, b2dbody.body.getPosition().y);
-        pec.isattached = true;
-        for (ParticleEmitter emitter : pec.particleEffect.getEmitters()) {
+
+        ParticleEffectComponent particleEffectComponent = engine.createComponent(ParticleEffectComponent.class);
+        ZComponent zComponent = engine.createComponent(ZComponent.class);
+        zComponent.z = 5f;
+
+        RenderingComponent renderingComponent = engine.createComponent(RenderingComponent.class);
+        renderingComponent.renderingType = RenderingComponent.RenderingType.PARTICLES;
+
+        particleEffectComponent.particleEffect = pem.getPooledParticleEffect(type);
+        particleEffectComponent.particleEffect.setPosition(b2dbody.body.getPosition().x, b2dbody.body.getPosition().y);
+        particleEffectComponent.isattached = true;
+        for (ParticleEmitter emitter : particleEffectComponent.particleEffect.getEmitters()) {
             emitter.setContinuous(true);
         }
 
-        pec.attachedBody = b2dbody.body;
-        pec.xOffset = xOffset;
-        pec.yOffset = yOffset;
+        particleEffectComponent.attachedBody = b2dbody.body;
+        particleEffectComponent.xOffset = xOffset;
+        particleEffectComponent.yOffset = yOffset;
 
-        pec.particleEffect.start();
-        entPE.add(pec);
-        engine.addEntity(entPE);
-        return entPE;
+        particleEffectComponent.particleEffect.start();
+
+        Entity particleEffectEntity = engine.createEntity();
+        particleEffectEntity.add(particleEffectComponent);
+        particleEffectEntity.add(renderingComponent);
+        particleEffectEntity.add(zComponent);
+
+        engine.addEntity(particleEffectEntity);
+        return particleEffectEntity;
     }
 
     public void resetWorld() {
