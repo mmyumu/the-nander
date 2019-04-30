@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -19,6 +20,7 @@ public class PlayerControlSystem extends IteratingSystem {
     private static final float BULLET_SPEED = 10f;
     private static final float PLAYER_SPEED = 10f;
     private static final float ACCELERATION = 1f;
+    private static final float TRAIL_SPREAD_ANGLE = 60f;
 
     private final ComponentMapper<PlayerComponent> pm;
     private final ComponentMapper<B2dBodyComponent> bodm;
@@ -86,7 +88,7 @@ public class PlayerControlSystem extends IteratingSystem {
             if (playerComponent.particleEffect != null) {
                 ParticleEffectComponent particleEffectComponent = particleEffectComponentMapper.get(playerComponent.particleEffect);
                 if (particleEffectComponent != null) {
-                    particleEffectComponent.particleEffect.getEmitters().forEach(e -> e.allowCompletion());
+                    particleEffectComponent.particleEffect.getEmitters().forEach(ParticleEmitter::allowCompletion);
                 }
             }
         } else {
@@ -109,6 +111,17 @@ public class PlayerControlSystem extends IteratingSystem {
                 } else if (!playerMovement.isZero()) {
                     zComponent.z = 5f;
                 }
+            }
+
+            if (!playerMovement.isZero()) {
+                float low = (playerMovement.angle() + 180) % 360;
+                System.out.println("angle=" + low);
+                ParticleEffectComponent particleEffectComponent = particleEffectComponentMapper.get(playerComponent.particleEffect);
+                particleEffectComponent.particleEffect.getEmitters().forEach(emitter -> {
+                    emitter.getAngle().setLow(low);
+                    emitter.getAngle().setHighMin(low - TRAIL_SPREAD_ANGLE);
+                    emitter.getAngle().setHighMax(low + TRAIL_SPREAD_ANGLE);
+                });
             }
         }
 
