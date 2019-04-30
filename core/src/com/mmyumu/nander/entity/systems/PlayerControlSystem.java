@@ -17,7 +17,7 @@ import com.mmyumu.nander.entity.components.PlayerComponent;
 import com.mmyumu.nander.entity.components.ZComponent;
 
 public class PlayerControlSystem extends IteratingSystem {
-    private static final float BULLET_SPEED = 10f;
+    private static final float BULLET_SPEED = 15f;
     private static final float PLAYER_SPEED = 10f;
     private static final float ACCELERATION = 1f;
     private static final float TRAIL_SPREAD_ANGLE = 60f;
