@@ -53,7 +53,10 @@ public class BulletSystem extends IteratingSystem {
         if (bullet.dead) {
             System.out.println("Bullet died");
             if (bullet.particleEffect != null) {
-                particleEffectComponentMapper.get(bullet.particleEffect).isDead = true;
+                ParticleEffectComponent particleEffectComponent = particleEffectComponentMapper.get(bullet.particleEffect);
+                if (particleEffectComponent != null) {
+                    particleEffectComponent.isDead = true;
+                }
             }
 
             b2body.dead = true;
