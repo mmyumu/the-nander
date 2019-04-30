@@ -47,7 +47,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LevelFactory {
+    /**
+     * Maps constants
+     **/
     private static final float TILED_MAP_RATIO = 1 / 8f;
+    private static final int MAP_ZONE_DIMENSION = 5;
+    private static final int MAP_ZONE_SIZE = 20;
+    private static final int MAP_TILE_HEIGHT = 8;
+    private static final int MAP_TILE_WIDTH = 8;
     private static final String BACKGROUND_LAYER_NAME = "background";
     private static final String FOREGROUND_LAYER_NAME = "foreground";
 
@@ -254,7 +261,7 @@ public class LevelFactory {
         }
 
         TiledMapComponent mapComponent = engine.createComponent(TiledMapComponent.class);
-        mapComponent.mapRenderer = new OrthoCachedTiledMapRenderer(map, TILED_MAP_RATIO);
+        mapComponent.mapRenderer = new OrthoCachedTiledMapRenderer(map, TILED_MAP_RATIO, 8191);
         mapComponent.backgroundLayers = new int[]{map.getLayers().getIndex(BACKGROUND_LAYER_NAME)};
         mapComponent.foregroundLayers = new int[]{map.getLayers().getIndex(FOREGROUND_LAYER_NAME)};
 
@@ -276,15 +283,24 @@ public class LevelFactory {
     private List<MapLayer> createMapTileLayer(List<TiledMap> maps) {
         List<MapLayer> layers = new ArrayList<>();
 
-        TiledMapTileLayer backgroundLayer = new TiledMapTileLayer(40, 40, 8, 8);
-        TiledMapTileLayer foregroundLayer = new TiledMapTileLayer(40, 40, 8, 8);
+        TiledMapTileLayer backgroundLayer = new TiledMapTileLayer(
+                MAP_ZONE_SIZE * MAP_ZONE_DIMENSION,
+                MAP_ZONE_SIZE * MAP_ZONE_DIMENSION,
+                MAP_TILE_WIDTH,
+                MAP_TILE_HEIGHT);
+        TiledMapTileLayer foregroundLayer = new TiledMapTileLayer(
+                MAP_ZONE_SIZE * MAP_ZONE_DIMENSION,
+                MAP_ZONE_SIZE * MAP_ZONE_DIMENSION,
+                MAP_TILE_WIDTH,
+                MAP_TILE_HEIGHT);
         backgroundLayer.setName(BACKGROUND_LAYER_NAME);
         foregroundLayer.setName(FOREGROUND_LAYER_NAME);
 
-        createMapTileLayerZone(maps, backgroundLayer, foregroundLayer, 0, 0);
-        createMapTileLayerZone(maps, backgroundLayer, foregroundLayer, 0, 20);
-        createMapTileLayerZone(maps, backgroundLayer, foregroundLayer, 20, 0);
-        createMapTileLayerZone(maps, backgroundLayer, foregroundLayer, 20, 20);
+        for (int i = 0; i < MAP_ZONE_DIMENSION; i++) {
+            for (int j = 0; j < MAP_ZONE_DIMENSION; j++) {
+                createMapTileLayerZone(maps, backgroundLayer, foregroundLayer, i * MAP_ZONE_SIZE, j * MAP_ZONE_SIZE);
+            }
+        }
 
         layers.add(backgroundLayer);
         layers.add(foregroundLayer);
