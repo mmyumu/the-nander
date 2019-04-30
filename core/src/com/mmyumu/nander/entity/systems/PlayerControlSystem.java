@@ -115,7 +115,6 @@ public class PlayerControlSystem extends IteratingSystem {
 
             if (!playerMovement.isZero()) {
                 float low = (playerMovement.angle() + 180) % 360;
-                System.out.println("angle=" + low);
                 ParticleEffectComponent particleEffectComponent = particleEffectComponentMapper.get(playerComponent.particleEffect);
                 particleEffectComponent.particleEffect.getEmitters().forEach(emitter -> {
                     emitter.getAngle().setLow(low);
