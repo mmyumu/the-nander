@@ -14,12 +14,12 @@ public class BulletSystem extends IteratingSystem {
     private final ComponentMapper<B2dBodyComponent> b2dBodyComponentMapper;
     private final ComponentMapper<BulletComponent> bulletComponentMapper;
     private final ComponentMapper<ParticleEffectComponent> particleEffectComponentMapper;
-    private LevelFactory lvlFactory;
+    private LevelFactory levelFactory;
 
     @SuppressWarnings("unchecked")
-    public BulletSystem(LevelFactory lvlFactory) {
+    public BulletSystem(LevelFactory levelFactory) {
         super(Family.all(BulletComponent.class).get());
-        this.lvlFactory = lvlFactory;
+        this.levelFactory = levelFactory;
 
         b2dBodyComponentMapper = ComponentMapper.getFor(B2dBodyComponent.class);
         bulletComponentMapper = ComponentMapper.getFor(BulletComponent.class);
@@ -33,10 +33,10 @@ public class BulletSystem extends IteratingSystem {
         BulletComponent bullet = bulletComponentMapper.get(entity);
 
         // apply bullet velocity to bullet body
-        b2body.body.setLinearVelocity(bullet.xVel, bullet.yVel);
+        b2body.body.setLinearVelocity(bullet.xVelocity, bullet.yVelocity);
 
         // get player pos
-        B2dBodyComponent playerBodyComp = b2dBodyComponentMapper.get(lvlFactory.player);
+        B2dBodyComponent playerBodyComp = b2dBodyComponentMapper.get(levelFactory.player);
         float px = playerBodyComp.body.getPosition().x;
         float py = playerBodyComp.body.getPosition().y;
 
@@ -55,7 +55,7 @@ public class BulletSystem extends IteratingSystem {
             if (bullet.particleEffect != null) {
                 ParticleEffectComponent particleEffectComponent = particleEffectComponentMapper.get(bullet.particleEffect);
                 if (particleEffectComponent != null) {
-                    particleEffectComponent.isDead = true;
+                    particleEffectComponent.dead = true;
                 }
             }
 

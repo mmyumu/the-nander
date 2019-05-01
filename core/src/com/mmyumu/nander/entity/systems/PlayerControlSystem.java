@@ -22,12 +22,12 @@ public class PlayerControlSystem extends IteratingSystem {
     private static final float ACCELERATION = 1f;
     private static final float TRAIL_SPREAD_ANGLE = 60f;
 
-    private final ComponentMapper<PlayerComponent> pm;
-    private final ComponentMapper<B2dBodyComponent> bodm;
+    private final ComponentMapper<PlayerComponent> playerComponentMapper;
+    private final ComponentMapper<B2dBodyComponent> b2dBodyComponentMapper;
     private final KeyboardController controller;
     private final ComponentMapper<ParticleEffectComponent> particleEffectComponentMapper;
     private final ComponentMapper<ZComponent> zComponentMapper;
-    private LevelFactory lvlFactory;
+    private LevelFactory levelFactory;
     private Viewport viewport;
 
     private final Vector2 playerMovement;
@@ -36,26 +36,26 @@ public class PlayerControlSystem extends IteratingSystem {
 
 
     @SuppressWarnings("unchecked")
-    public PlayerControlSystem(KeyboardController keyCon, LevelFactory lvlFactory, Viewport viewport) {
+    public PlayerControlSystem(KeyboardController keyCon, LevelFactory levelFactory, Viewport viewport) {
         super(Family.all(PlayerComponent.class).get());
         this.controller = keyCon;
-        this.lvlFactory = lvlFactory;
+        this.levelFactory = levelFactory;
         this.viewport = viewport;
 
         this.playerMovement = new Vector2();
         this.mousePos = new Vector3();
         this.bulletMovement = new Vector2();
 
-        this.pm = ComponentMapper.getFor(PlayerComponent.class);
-        this.bodm = ComponentMapper.getFor(B2dBodyComponent.class);
+        this.playerComponentMapper = ComponentMapper.getFor(PlayerComponent.class);
+        this.b2dBodyComponentMapper = ComponentMapper.getFor(B2dBodyComponent.class);
         this.particleEffectComponentMapper = ComponentMapper.getFor(ParticleEffectComponent.class);
         this.zComponentMapper = ComponentMapper.getFor(ZComponent.class);
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        B2dBodyComponent b2body = bodm.get(entity);
-        PlayerComponent playerComponent = pm.get(entity);
+        B2dBodyComponent b2body = b2dBodyComponentMapper.get(entity);
+        PlayerComponent playerComponent = playerComponentMapper.get(entity);
 
         playerComponent.camera.position.x = b2body.body.getPosition().x;
         playerComponent.camera.position.y = b2body.body.getPosition().y;
@@ -93,11 +93,11 @@ public class PlayerControlSystem extends IteratingSystem {
             }
         } else {
             if (playerComponent.particleEffect == null) {
-                playerComponent.particleEffect = lvlFactory.makeTrail(b2body);
+                playerComponent.particleEffect = levelFactory.makeTrail(b2body);
             } else {
                 ParticleEffectComponent particleEffectComponent = particleEffectComponentMapper.get(playerComponent.particleEffect);
                 if (particleEffectComponent == null) {
-                    playerComponent.particleEffect = lvlFactory.makeTrail(b2body);
+                    playerComponent.particleEffect = levelFactory.makeTrail(b2body);
                 }
             }
         }
@@ -142,7 +142,7 @@ public class PlayerControlSystem extends IteratingSystem {
 
                 bulletMovement.set(mousePos.x - shooterX, mousePos.y - shooterY);
                 bulletMovement.nor();
-                lvlFactory.createBullet(shooterX, shooterY, bulletMovement.x * BULLET_SPEED, bulletMovement.y * BULLET_SPEED);
+                levelFactory.createBullet(shooterX, shooterY, bulletMovement.x * BULLET_SPEED, bulletMovement.y * BULLET_SPEED);
                 playerComponent.timeSinceLastShot = playerComponent.shootDelay;
             }
         }

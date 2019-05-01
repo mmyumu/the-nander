@@ -10,9 +10,9 @@ import com.mmyumu.nander.entity.components.TextureComponent;
 
 public class AnimationSystem extends IteratingSystem {
 
-    ComponentMapper<TextureComponent> tm;
-    ComponentMapper<AnimationComponent> am;
-    ComponentMapper<StateComponent> sm;
+    private final ComponentMapper<TextureComponent> textureComponentMapper;
+    private final ComponentMapper<AnimationComponent> animationComponentMapper;
+    private final ComponentMapper<StateComponent> stateComponentMapper;
 
     @SuppressWarnings("unchecked")
     public AnimationSystem() {
@@ -20,20 +20,20 @@ public class AnimationSystem extends IteratingSystem {
                 AnimationComponent.class,
                 StateComponent.class).get());
 
-        tm = ComponentMapper.getFor(TextureComponent.class);
-        am = ComponentMapper.getFor(AnimationComponent.class);
-        sm = ComponentMapper.getFor(StateComponent.class);
+        textureComponentMapper = ComponentMapper.getFor(TextureComponent.class);
+        animationComponentMapper = ComponentMapper.getFor(AnimationComponent.class);
+        stateComponentMapper = ComponentMapper.getFor(StateComponent.class);
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
 
-        AnimationComponent ani = am.get(entity);
-        StateComponent state = sm.get(entity);
+        AnimationComponent ani = animationComponentMapper.get(entity);
+        StateComponent state = stateComponentMapper.get(entity);
 
         if (ani.animations.containsKey(state.get())) {
-            TextureComponent tex = tm.get(entity);
-            tex.region = ani.animations.get(state.get()).getKeyFrame(state.time, state.isLooping);
+            TextureComponent tex = textureComponentMapper.get(entity);
+            tex.region = ani.animations.get(state.get()).getKeyFrame(state.time, state.looping);
         }
 
         state.time += deltaTime;

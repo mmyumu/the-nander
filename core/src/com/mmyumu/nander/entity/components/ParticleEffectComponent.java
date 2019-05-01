@@ -7,11 +7,11 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 
 public class ParticleEffectComponent implements Component, Poolable {
     public PooledEffect particleEffect;
-    public boolean isattached = false;
+    public boolean attached = false;
     public float xOffset = 0;
     public float yOffset = 0;
     public float timeTilDeath = 0.5f; // add a 1 second delay
-    public boolean isDead = false;
+    public boolean dead = false;
     public Body attachedBody;
 
     @Override
@@ -20,8 +20,8 @@ public class ParticleEffectComponent implements Component, Poolable {
         particleEffect = null; // empty this component's particle effect
         xOffset = 0;
         yOffset = 0;
-        isattached = false;
-        isDead = false;
+        attached = false;
+        dead = false;
         attachedBody = null;
         timeTilDeath = 0.5f;
     }

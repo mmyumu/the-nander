@@ -30,11 +30,12 @@ import com.mmyumu.nander.entity.systems.PhysicsSystem;
 import com.mmyumu.nander.entity.systems.PlayerControlSystem;
 import com.mmyumu.nander.entity.systems.RenderingSystem;
 import com.mmyumu.nander.entity.systems.WallSystem;
-import com.mmyumu.nander.entity.systems.WaterFloorSystem;
 
 
 public class MainScreen implements Screen {
-    /** One Plus 6 resolution: 2280*1080 -> ratio=2.11111 **/
+    /**
+     * One Plus 6 resolution: 2280*1080 -> ratio=2.11111
+     **/
     private static final int VIEWPORT_WIDTH = 32;
     private static final int VIEWPORT_HEIGHT = 15;
     private final ComponentMapper<ParticleEffectComponent> particleEffectComponentMapper;
@@ -48,7 +49,7 @@ public class MainScreen implements Screen {
     private KeyboardController controller;
     private SpriteBatch spriteBatch;
     private PooledEngine engine;
-    private LevelFactory lvlFactory;
+    private LevelFactory levelFactory;
 
     private Sound ping;
     private Sound boing;
@@ -81,23 +82,22 @@ public class MainScreen implements Screen {
 
         spriteBatch.setProjectionMatrix(camera.combined);
 
-        lvlFactory = new LevelFactory(engine, parent.assetManager);
-        lvlFactory.createMap();
-        player = lvlFactory.createPlayer(camera);
-        lvlFactory.createFPS();
+        levelFactory = new LevelFactory(engine, parent.assetManager);
+        levelFactory.createMap();
+        player = levelFactory.createPlayer(camera);
+        levelFactory.createFPS();
 
         engine.addSystem(new AnimationSystem());
         engine.addSystem(new FPSSystem());
         engine.addSystem(renderingSystem);
-        engine.addSystem(new PhysicsDebugSystem(lvlFactory.world, renderingSystem.getCamera()));
+        engine.addSystem(new PhysicsDebugSystem(levelFactory.world, renderingSystem.getCamera()));
         engine.addSystem(particleSystem);
-        engine.addSystem(new PhysicsSystem(lvlFactory.world));
+        engine.addSystem(new PhysicsSystem(levelFactory.world));
         engine.addSystem(new CollisionSystem());
-        engine.addSystem(new PlayerControlSystem(controller, lvlFactory, viewport));
+        engine.addSystem(new PlayerControlSystem(controller, levelFactory, viewport));
         engine.addSystem(new EnemySystem());
-        engine.addSystem(new WallSystem(lvlFactory));
-        engine.addSystem(new WaterFloorSystem(lvlFactory));
-        engine.addSystem(new BulletSystem(lvlFactory));
+        engine.addSystem(new WallSystem(levelFactory));
+        engine.addSystem(new BulletSystem(levelFactory));
 
         particleEffectComponentMapper = ComponentMapper.getFor(ParticleEffectComponent.class);
     }
@@ -119,7 +119,7 @@ public class MainScreen implements Screen {
         PlayerComponent pc = (player.getComponent(PlayerComponent.class));
         if (pc.dead) {
             if (pc.particleEffect != null) {
-                particleEffectComponentMapper.get(pc.particleEffect).isDead = true;
+                particleEffectComponentMapper.get(pc.particleEffect).dead = true;
             }
             DFUtils.log("YOU DIED : back to menu you go!");
             parent.lastScore = (int) pc.camera.position.y;
@@ -152,15 +152,15 @@ public class MainScreen implements Screen {
     public void resetWorld() {
         System.out.println("Resetting world");
         engine.removeAllEntities();
-        lvlFactory.resetWorld();
+        levelFactory.resetWorld();
 
-        lvlFactory.createMap();
-        player = lvlFactory.createPlayer(camera);
+        levelFactory.createMap();
+        player = levelFactory.createPlayer(camera);
 
         int wallWidth = (int) (1 * RenderingSystem.PPM);
         int wallHeight = (int) (60 * RenderingSystem.PPM);
         TextureRegion wallRegion = DFUtils.makeTextureRegion(wallWidth, wallHeight, "222222FF");
-        lvlFactory.createWalls(wallRegion); //TODO make some damn images for this stuff
+        levelFactory.createWalls(wallRegion); //TODO make some damn images for this stuff
 
         // reset controller controls (fixes bug where controller stuck on directrion if died in that position)
         controller.left = false;

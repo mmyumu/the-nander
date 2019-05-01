@@ -6,12 +6,12 @@ import com.badlogic.gdx.utils.Pool;
 public class EnemyComponent implements Component, Pool.Poolable {
     public boolean dead = false;
     public float xPosCenter = -1;
-    public boolean isGoingLeft = false;
+    public boolean goingLeft = false;
 
     @Override
     public void reset() {
         dead = false;
         xPosCenter = -1;
-        isGoingLeft = false;
+        goingLeft = false;
     }
 }

@@ -22,7 +22,7 @@ public class ParticleEffectSystem extends IteratingSystem {
     @SuppressWarnings("unchecked")
     public ParticleEffectSystem(SpriteBatch batch, OrthographicCamera camera) {
         super(Family.all(ParticleEffectComponent.class).get());
-        renderQueue = new Array<>();
+        this.renderQueue = new Array<>();
         this.batch = batch;
         this.camera = camera;
 
@@ -48,22 +48,22 @@ public class ParticleEffectSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-//        ParticleEffectComponent pec = particleEffectComponentMapper.get(entity);
-//        if (pec.isDead) {
-//            pec.timeTilDeath -= deltaTime;
-//        }
-//
-//        // Move PE if attached
-//        if (pec.isattached) {
-//            pec.particleEffect.setPosition(
-//                    pec.attachedBody.getPosition().x + pec.xOffset,
-//                    pec.attachedBody.getPosition().y + pec.yOffset);
-//        }
-//        // free PE if completed
-//        if (pec.particleEffect.isComplete() || pec.timeTilDeath <= 0) {
-//            getEngine().removeEntity(entity);
-//        } else {
-//            renderQueue.add(entity);
-//        }
+        ParticleEffectComponent pec = particleEffectComponentMapper.get(entity);
+        if (pec.dead) {
+            pec.timeTilDeath -= deltaTime;
+        }
+
+        // Move PE if attached
+        if (pec.attached) {
+            pec.particleEffect.setPosition(
+                    pec.attachedBody.getPosition().x + pec.xOffset,
+                    pec.attachedBody.getPosition().y + pec.yOffset);
+        }
+        // free PE if completed
+        if (pec.particleEffect.isComplete() || pec.timeTilDeath <= 0) {
+            getEngine().removeEntity(entity);
+        } else {
+            renderQueue.add(entity);
+        }
     }
 }

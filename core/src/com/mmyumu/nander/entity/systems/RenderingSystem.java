@@ -22,17 +22,13 @@ import java.util.Comparator;
 
 
 public class RenderingSystem extends IteratingSystem {
-    /**
-     * this gets the height and width of our camera frustrum based off the width and height of the screen and our pixel per meter ratio
-     **/
+    /* This gets the height and width of our camera frustrum based off the width and height of the screen and our pixel per meter ratio */
     public static final float PPM = 32.0f; // sets the amount of pixels each metre of box2d objects contains
     private static final float FRUSTUM_WIDTH = Gdx.graphics.getWidth() / PPM;
     private static final float FRUSTUM_HEIGHT = Gdx.graphics.getHeight() / PPM;
     private static final float PIXELS_TO_METRES = 1.0f / PPM; // get the ratio for converting pixels to metres
 
-    /**
-     * Rendering attributes
-     **/
+    /* Rendering attributes */
     private final BitmapFont font;
     private final SpriteBatch hudBatch;
     private final SpriteBatch batch; // a reference to our spritebatch
@@ -44,9 +40,7 @@ public class RenderingSystem extends IteratingSystem {
     private final Comparator<Entity> comparator;
     private final OrthographicCamera camera;
 
-    /**
-     * Component mappers to get components from entities
-     **/
+    /* Component mappers to get components from entities */
     private final ComponentMapper<TextureComponent> textureComponentMapper;
     private final ComponentMapper<TransformComponent> transformComponentMapper;
     private final ComponentMapper<PositionComponent> positionComponentMapper;
@@ -177,12 +171,12 @@ public class RenderingSystem extends IteratingSystem {
                 break;
             case PARTICLES:
                 ParticleEffectComponent pec = particleEffectComponentMapper.get(entity);
-                if (pec.isDead) {
+                if (pec.dead) {
                     pec.timeTilDeath -= deltaTime;
                 }
 
                 // Move PE if attached
-                if (pec.isattached) {
+                if (pec.attached) {
                     pec.particleEffect.setPosition(
                             pec.attachedBody.getPosition().x + pec.xOffset,
                             pec.attachedBody.getPosition().y + pec.yOffset);

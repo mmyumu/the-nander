@@ -20,8 +20,8 @@ public class PhysicsSystem extends IteratingSystem {
     private final ComponentMapper<TransformComponent> transformComponentMapper;
     private final ComponentMapper<PositionComponent> positionComponentMapper;
 
-    private World world;
-    private Array<Entity> bodiesQueue;
+    private final World world;
+    private final Array<Entity> bodiesQueue;
 
 
     @SuppressWarnings("unchecked")

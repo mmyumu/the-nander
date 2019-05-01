@@ -52,7 +52,6 @@ public class NanderAssetManager {
         manager.load(gameImages, TextureAtlas.class);
     }
 
-    // a small set of images used by the loading screen
     public void queueAddLoadingImages() {
         manager.load(loadingImages, TextureAtlas.class);
         manager.load(characterImage, Texture.class);

@@ -179,7 +179,7 @@ public class LevelFactory {
     }
 
     public Entity createBullet(float x, float y, float xVel, float yVel) {
-        System.out.println("Making bullet x=" + x + ", y=" + y + ", xVel=" + xVel + ", yVel=" + yVel);
+        System.out.println("Making bullet x=" + x + ", y=" + y + ", xVelocity=" + xVel + ", yVelocity=" + yVel);
         Entity entity = engine.createEntity();
         B2dBodyComponent b2dbody = engine.createComponent(B2dBodyComponent.class);
         TransformComponent transformComponent = engine.createComponent(TransformComponent.class);
@@ -204,8 +204,8 @@ public class LevelFactory {
 
         type.type = TypeComponent.BULLET;
         b2dbody.body.setUserData(entity);
-        bul.xVel = xVel;
-        bul.yVel = yVel;
+        bul.xVelocity = xVel;
+        bul.yVelocity = yVel;
 
         //attach party to bullet
         bul.particleEffect = makeParticleEffect(ParticleEffectManager.FIRE, b2dbody);
@@ -423,7 +423,7 @@ public class LevelFactory {
 
         particleEffectComponent.particleEffect = pem.getPooledParticleEffect(type);
         particleEffectComponent.particleEffect.setPosition(b2dbody.body.getPosition().x, b2dbody.body.getPosition().y);
-        particleEffectComponent.isattached = true;
+        particleEffectComponent.attached = true;
         for (ParticleEmitter emitter : particleEffectComponent.particleEffect.getEmitters()) {
             emitter.setContinuous(true);
         }
