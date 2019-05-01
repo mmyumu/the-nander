@@ -20,10 +20,7 @@ public class NanderGame extends Game {
 
     public NanderAssetManager assetManager = new NanderAssetManager();
 
-    public final static int MENU = 0;
-    public final static int PREFERENCES = 1;
-    public final static int APPLICATION = 2;
-    public final static int ENDGAME = 3;
+
 
     private Music playingSong;
 
@@ -46,7 +43,7 @@ public class NanderGame extends Game {
         playingSong.play();
     }
 
-    public void changeScreen(int screen) {
+    public void changeScreen(NanderScreen screen) {
         switch (screen) {
             case MENU:
                 if (menuScreen == null) menuScreen = new MenuScreen(this);

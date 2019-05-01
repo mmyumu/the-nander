@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mmyumu.nander.NanderGame;
+import com.mmyumu.nander.NanderScreen;
 
 public class LoadingScreen implements Screen {
 
@@ -159,7 +160,7 @@ public class LoadingScreen implements Screen {
                 countDown -= delta;
                 currentLoadingStage = 6;
                 if (countDown < 0) {
-                    parent.changeScreen(NanderGame.MENU);
+                    parent.changeScreen(NanderScreen.MENU);
                 }
             }
         }

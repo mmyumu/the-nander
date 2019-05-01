@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mmyumu.nander.DFUtils;
 import com.mmyumu.nander.NanderGame;
+import com.mmyumu.nander.NanderScreen;
 
 public class EndScreen implements Screen {
 
@@ -45,7 +46,7 @@ public class EndScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 DFUtils.log("To the MENU");
-                parent.changeScreen(NanderGame.MENU);
+                parent.changeScreen(NanderScreen.MENU);
             }
         });
 

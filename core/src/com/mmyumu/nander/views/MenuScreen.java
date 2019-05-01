@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mmyumu.nander.NanderGame;
+import com.mmyumu.nander.NanderScreen;
 
 public class MenuScreen implements Screen {
     private final Stage stage;
@@ -43,13 +44,13 @@ public class MenuScreen implements Screen {
         newGame.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                parent.changeScreen(NanderGame.APPLICATION);
+                parent.changeScreen(NanderScreen.APPLICATION);
             }
         });
         preferences.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                parent.changeScreen(NanderGame.PREFERENCES);
+                parent.changeScreen(NanderScreen.PREFERENCES);
             }
         });
         exit.addListener(new ChangeListener() {

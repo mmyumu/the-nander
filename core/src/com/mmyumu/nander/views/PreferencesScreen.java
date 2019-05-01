@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mmyumu.nander.NanderGame;
+import com.mmyumu.nander.NanderScreen;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -58,7 +59,7 @@ public class PreferencesScreen implements Screen {
         backButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.changeScreen(NanderGame.MENU);
+                game.changeScreen(NanderScreen.MENU);
             }
         });
 

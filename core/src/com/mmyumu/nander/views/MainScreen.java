@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mmyumu.nander.DFUtils;
 import com.mmyumu.nander.LevelFactory;
 import com.mmyumu.nander.NanderGame;
+import com.mmyumu.nander.NanderScreen;
 import com.mmyumu.nander.controller.KeyboardController;
 import com.mmyumu.nander.entity.components.ParticleEffectComponent;
 import com.mmyumu.nander.entity.components.PlayerComponent;
@@ -123,7 +124,7 @@ public class MainScreen implements Screen {
             }
             DFUtils.log("YOU DIED : back to menu you go!");
             parent.lastScore = (int) pc.camera.position.y;
-            parent.changeScreen(NanderGame.ENDGAME);
+            parent.changeScreen(NanderScreen.ENDGAME);
         }
     }
 
