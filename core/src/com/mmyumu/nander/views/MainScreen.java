@@ -25,7 +25,6 @@ import com.mmyumu.nander.entity.systems.BulletSystem;
 import com.mmyumu.nander.entity.systems.CollisionSystem;
 import com.mmyumu.nander.entity.systems.EnemySystem;
 import com.mmyumu.nander.entity.systems.FPSSystem;
-import com.mmyumu.nander.entity.systems.ParticleEffectSystem;
 import com.mmyumu.nander.entity.systems.PhysicsDebugSystem;
 import com.mmyumu.nander.entity.systems.PhysicsSystem;
 import com.mmyumu.nander.entity.systems.PlayerControlSystem;
@@ -79,8 +78,6 @@ public class MainScreen implements Screen {
         viewport = new FitViewport(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, camera);
         viewport.getCamera().update();
 
-        ParticleEffectSystem particleSystem = new ParticleEffectSystem(spriteBatch, camera);
-
         spriteBatch.setProjectionMatrix(camera.combined);
 
         levelFactory = new LevelFactory(engine, parent.assetManager);
@@ -92,7 +89,6 @@ public class MainScreen implements Screen {
         engine.addSystem(new FPSSystem());
         engine.addSystem(renderingSystem);
         engine.addSystem(new PhysicsDebugSystem(levelFactory.world, renderingSystem.getCamera()));
-        engine.addSystem(particleSystem);
         engine.addSystem(new PhysicsSystem(levelFactory.world));
         engine.addSystem(new CollisionSystem());
         engine.addSystem(new PlayerControlSystem(controller, levelFactory, viewport));
