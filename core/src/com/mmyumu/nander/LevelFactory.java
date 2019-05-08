@@ -35,6 +35,7 @@ import com.mmyumu.nander.entity.components.PlayerComponent;
 import com.mmyumu.nander.entity.components.PositionComponent;
 import com.mmyumu.nander.entity.components.RenderingComponent;
 import com.mmyumu.nander.entity.components.StateComponent;
+import com.mmyumu.nander.entity.components.TextComponent;
 import com.mmyumu.nander.entity.components.TextureComponent;
 import com.mmyumu.nander.entity.components.TiledMapComponent;
 import com.mmyumu.nander.entity.components.TransformComponent;
@@ -226,9 +227,11 @@ public class LevelFactory {
 
     public void createFPS() {
         OverlayComponent overlayComponent = new OverlayComponent();
+        overlayComponent.type = OverlayComponent.Type.TEXT;
         PositionComponent positionComponent = new PositionComponent();
         positionComponent.x = 10f;
         positionComponent.y = Gdx.graphics.getHeight() - 10f;
+        TextComponent textComponent = new TextComponent();
 
         RenderingComponent renderingComponent = engine.createComponent(RenderingComponent.class);
         renderingComponent.renderingType = RenderingComponent.RenderingType.OVERLAY;
@@ -238,6 +241,7 @@ public class LevelFactory {
         fpsEntity.add(overlayComponent);
         fpsEntity.add(renderingComponent);
         fpsEntity.add(positionComponent);
+        fpsEntity.add(textComponent);
         engine.addEntity(fpsEntity);
     }
 

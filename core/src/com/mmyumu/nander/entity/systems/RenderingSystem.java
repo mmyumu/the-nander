@@ -14,6 +14,7 @@ import com.mmyumu.nander.entity.components.OverlayComponent;
 import com.mmyumu.nander.entity.components.ParticleEffectComponent;
 import com.mmyumu.nander.entity.components.PositionComponent;
 import com.mmyumu.nander.entity.components.RenderingComponent;
+import com.mmyumu.nander.entity.components.TextComponent;
 import com.mmyumu.nander.entity.components.TextureComponent;
 import com.mmyumu.nander.entity.components.TiledMapComponent;
 import com.mmyumu.nander.entity.components.TransformComponent;
@@ -41,6 +42,7 @@ public class RenderingSystem extends IteratingSystem {
     private final OrthographicCamera camera;
 
     /* Component mappers to get components from entities */
+    private final ComponentMapper<TextComponent> textComponentMapper;
     private final ComponentMapper<TextureComponent> textureComponentMapper;
     private final ComponentMapper<TransformComponent> transformComponentMapper;
     private final ComponentMapper<PositionComponent> positionComponentMapper;
@@ -54,6 +56,7 @@ public class RenderingSystem extends IteratingSystem {
     public RenderingSystem(SpriteBatch batch) {
         super(Family.all(RenderingComponent.class).get());
 
+        textComponentMapper = ComponentMapper.getFor(TextComponent.class);
         textureComponentMapper = ComponentMapper.getFor(TextureComponent.class);
         transformComponentMapper = ComponentMapper.getFor(TransformComponent.class);
         positionComponentMapper = ComponentMapper.getFor(PositionComponent.class);
@@ -83,6 +86,7 @@ public class RenderingSystem extends IteratingSystem {
 
         // sort the renderQueue based on z index
         renderQueue.sort(comparator);
+        overlayRenderQueue.sort(comparator);
 
         // update camera and sprite batch
         camera.update();
@@ -145,7 +149,19 @@ public class RenderingSystem extends IteratingSystem {
             PositionComponent positionComponent = positionComponentMapper.get(entity);
             OverlayComponent overlayComponent = overlayComponentMapper.get(entity);
 
-            font.draw(hudBatch, overlayComponent.text, positionComponent.x, positionComponent.y);
+            if (overlayComponent.type == OverlayComponent.Type.TEXT) {
+                TextComponent textComponent = textComponentMapper.get(entity);
+                font.draw(hudBatch, textComponent.text, positionComponent.x, positionComponent.y);
+            } else if (overlayComponent.type == OverlayComponent.Type.TEXTURE) {
+                TextureComponent textureComponent = textureComponentMapper.get(entity);
+
+                float width = textureComponent.region.getRegionWidth();
+                float height = textureComponent.region.getRegionHeight();
+
+                batch.draw(textureComponent.region,
+                        positionComponent.x, positionComponent.y,
+                        width, height);
+            }
         }
         overlayRenderQueue.clear();
 
