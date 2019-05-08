@@ -226,23 +226,53 @@ public class LevelFactory {
     }
 
     public void createFPS() {
-        OverlayComponent overlayComponent = new OverlayComponent();
+        OverlayComponent overlayComponent = engine.createComponent(OverlayComponent.class);
+        PositionComponent positionComponent = engine.createComponent(PositionComponent.class);
+        RenderingComponent renderingComponent = engine.createComponent(RenderingComponent.class);
+        TextComponent textComponent = engine.createComponent(TextComponent.class);
+        FPSComponent fpsComponent = engine.createComponent(FPSComponent.class);
+
         overlayComponent.type = OverlayComponent.Type.TEXT;
-        PositionComponent positionComponent = new PositionComponent();
+
         positionComponent.x = 10f;
         positionComponent.y = Gdx.graphics.getHeight() - 10f;
-        TextComponent textComponent = new TextComponent();
 
-        RenderingComponent renderingComponent = engine.createComponent(RenderingComponent.class);
         renderingComponent.renderingType = RenderingComponent.RenderingType.OVERLAY;
 
         Entity fpsEntity = engine.createEntity();
-        fpsEntity.add(new FPSComponent());
+
+        fpsEntity.add(fpsComponent);
         fpsEntity.add(overlayComponent);
         fpsEntity.add(renderingComponent);
         fpsEntity.add(positionComponent);
         fpsEntity.add(textComponent);
+
         engine.addEntity(fpsEntity);
+    }
+
+    public void createOnScreenPad() {
+        OverlayComponent overlayComponent = engine.createComponent(OverlayComponent.class);
+        PositionComponent positionComponent = engine.createComponent(PositionComponent.class);
+        RenderingComponent renderingComponent = engine.createComponent(RenderingComponent.class);
+        TextureComponent textureComponent = engine.createComponent(TextureComponent.class);
+
+        overlayComponent.type = OverlayComponent.Type.TEXTURE;
+
+        positionComponent.x = 10f;
+        positionComponent.y = 10f;
+
+        renderingComponent.renderingType = RenderingComponent.RenderingType.OVERLAY;
+
+        textureComponent.region = new TextureRegion(assetManager.manager.get("onscreencontrols/shadedDark/shadedDark09.png", Texture.class));
+
+        Entity onScreenPadEntity = engine.createEntity();
+
+        onScreenPadEntity.add(overlayComponent);
+        onScreenPadEntity.add(renderingComponent);
+        onScreenPadEntity.add(positionComponent);
+        onScreenPadEntity.add(textureComponent);
+
+        engine.addEntity(onScreenPadEntity);
     }
 
     /**
@@ -449,7 +479,7 @@ public class LevelFactory {
 
     public void resetWorld() {
         currentLevel = 0;
-        Array<Body> bods = new Array<Body>();
+        Array<Body> bods = new Array<>();
         world.getBodies(bods);
         for (Body bod : bods) {
             world.destroyBody(bod);

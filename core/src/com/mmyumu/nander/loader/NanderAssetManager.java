@@ -19,9 +19,11 @@ public class NanderAssetManager {
     public final String gameImages = "images/game.atlas";
     public final String loadingImages = "images/loading.atlas";
 
-    public final String characterImage = "images/character1.png";
-    public final String characterImage24 = "images/character24.png";
+    //    public final String characterImage = "images/character1.png";
+//    public final String characterImage24 = "images/character24.png";
     public final String characterImage30 = "images/character30.png";
+
+    public final String onScreenPad = "onscreencontrols/shadedDark/shadedDark09.png";
 
     public final String boingSound = "sounds/boing.wav";
     public final String pingSound = "sounds/ping.wav";
@@ -54,9 +56,10 @@ public class NanderAssetManager {
 
     public void queueAddLoadingImages() {
         manager.load(loadingImages, TextureAtlas.class);
-        manager.load(characterImage, Texture.class);
-        manager.load(characterImage24, Texture.class);
+//        manager.load(characterImage, Texture.class);
+//        manager.load(characterImage24, Texture.class);
         manager.load(characterImage30, Texture.class);
+        manager.load(onScreenPad, Texture.class);
     }
 
     public void queueAddSounds() {

@@ -158,7 +158,7 @@ public class RenderingSystem extends IteratingSystem {
                 float width = textureComponent.region.getRegionWidth();
                 float height = textureComponent.region.getRegionHeight();
 
-                batch.draw(textureComponent.region,
+                hudBatch.draw(textureComponent.region,
                         positionComponent.x, positionComponent.y,
                         width, height);
             }

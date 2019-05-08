@@ -84,6 +84,7 @@ public class MainScreen implements Screen {
         levelFactory.createMap();
         player = levelFactory.createPlayer(camera);
         levelFactory.createFPS();
+        levelFactory.createOnScreenPad();
 
         engine.addSystem(new AnimationSystem());
         engine.addSystem(new FPSSystem());
