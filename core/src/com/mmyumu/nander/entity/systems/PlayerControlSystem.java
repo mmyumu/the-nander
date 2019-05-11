@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mmyumu.nander.LevelFactory;
+import com.mmyumu.nander.controller.Inputs;
 import com.mmyumu.nander.controller.KeyboardController;
 import com.mmyumu.nander.entity.components.B2dBodyComponent;
 import com.mmyumu.nander.entity.components.ParticleEffectComponent;
@@ -24,7 +25,7 @@ public class PlayerControlSystem extends IteratingSystem {
 
     private final ComponentMapper<PlayerComponent> playerComponentMapper;
     private final ComponentMapper<B2dBodyComponent> b2dBodyComponentMapper;
-    private final KeyboardController controller;
+    private final Inputs inputs;
     private final ComponentMapper<ParticleEffectComponent> particleEffectComponentMapper;
     private final ComponentMapper<ZComponent> zComponentMapper;
     private LevelFactory levelFactory;
@@ -36,9 +37,9 @@ public class PlayerControlSystem extends IteratingSystem {
 
 
     @SuppressWarnings("unchecked")
-    public PlayerControlSystem(KeyboardController keyCon, LevelFactory levelFactory, Viewport viewport) {
+    public PlayerControlSystem(Inputs inputs, LevelFactory levelFactory, Viewport viewport) {
         super(Family.all(PlayerComponent.class).get());
-        this.controller = keyCon;
+        this.inputs = inputs;
         this.levelFactory = levelFactory;
         this.viewport = viewport;
 
@@ -62,17 +63,17 @@ public class PlayerControlSystem extends IteratingSystem {
 
         playerMovement.set(0, 0);
 
-        if (controller.left) {
+        if (inputs.isLeft()) {
             playerMovement.x -= 1;
         }
-        if (controller.right) {
+        if (inputs.isRight()) {
             playerMovement.x += 1;
         }
-        if (controller.up) {
+        if (inputs.isUp()) {
             playerMovement.y += 1;
 
         }
-        if (controller.down) {
+        if (inputs.isDown()) {
             playerMovement.y -= 1;
         }
 
@@ -106,7 +107,7 @@ public class PlayerControlSystem extends IteratingSystem {
         if (playerComponent.particleEffect != null) {
             ZComponent zComponent = zComponentMapper.get(playerComponent.particleEffect);
             if (zComponent != null) {
-                if (controller.up) {
+                if (inputs.isUp()) {
                     zComponent.z = 15f;
                 } else if (!playerMovement.isZero()) {
                     zComponent.z = 5f;
@@ -129,11 +130,11 @@ public class PlayerControlSystem extends IteratingSystem {
             playerComponent.timeSinceLastShot = playerComponent.timeSinceLastShot - deltaTime;
         }
 
-        if (controller.isMouse1Down) { // if mouse button is pressed
+        if (inputs.isShoot()) { // if mouse button is pressed
             // user wants to fire
             if (playerComponent.timeSinceLastShot <= 0) { // check the playerComponent hasn't just shot
                 //playerComponent can shoot so do playerComponent shoot
-                mousePos.set(controller.mouseLocation.x, controller.mouseLocation.y, 0);
+                mousePos.set(inputs.getShootPosition().x, inputs.getShootPosition().y, 0);
                 viewport.unproject(mousePos);
                 float shooterX = b2body.body.getPosition().x;
                 float shooterY = b2body.body.getPosition().y;

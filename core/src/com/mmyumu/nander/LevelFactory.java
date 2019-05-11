@@ -2,7 +2,6 @@ package com.mmyumu.nander;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -28,14 +27,11 @@ import com.mmyumu.nander.entity.components.AnimationComponent;
 import com.mmyumu.nander.entity.components.B2dBodyComponent;
 import com.mmyumu.nander.entity.components.BulletComponent;
 import com.mmyumu.nander.entity.components.CollisionComponent;
-import com.mmyumu.nander.entity.components.FPSComponent;
-import com.mmyumu.nander.entity.components.OverlayComponent;
 import com.mmyumu.nander.entity.components.ParticleEffectComponent;
 import com.mmyumu.nander.entity.components.PlayerComponent;
 import com.mmyumu.nander.entity.components.PositionComponent;
 import com.mmyumu.nander.entity.components.RenderingComponent;
 import com.mmyumu.nander.entity.components.StateComponent;
-import com.mmyumu.nander.entity.components.TextComponent;
 import com.mmyumu.nander.entity.components.TextureComponent;
 import com.mmyumu.nander.entity.components.TiledMapComponent;
 import com.mmyumu.nander.entity.components.TransformComponent;
@@ -223,56 +219,6 @@ public class LevelFactory {
 
         engine.addEntity(entity);
         return entity;
-    }
-
-    public void createFPS() {
-        OverlayComponent overlayComponent = engine.createComponent(OverlayComponent.class);
-        PositionComponent positionComponent = engine.createComponent(PositionComponent.class);
-        RenderingComponent renderingComponent = engine.createComponent(RenderingComponent.class);
-        TextComponent textComponent = engine.createComponent(TextComponent.class);
-        FPSComponent fpsComponent = engine.createComponent(FPSComponent.class);
-
-        overlayComponent.type = OverlayComponent.Type.TEXT;
-
-        positionComponent.x = 10f;
-        positionComponent.y = Gdx.graphics.getHeight() - 10f;
-
-        renderingComponent.renderingType = RenderingComponent.RenderingType.OVERLAY;
-
-        Entity fpsEntity = engine.createEntity();
-
-        fpsEntity.add(fpsComponent);
-        fpsEntity.add(overlayComponent);
-        fpsEntity.add(renderingComponent);
-        fpsEntity.add(positionComponent);
-        fpsEntity.add(textComponent);
-
-        engine.addEntity(fpsEntity);
-    }
-
-    public void createOnScreenPad() {
-        OverlayComponent overlayComponent = engine.createComponent(OverlayComponent.class);
-        PositionComponent positionComponent = engine.createComponent(PositionComponent.class);
-        RenderingComponent renderingComponent = engine.createComponent(RenderingComponent.class);
-        TextureComponent textureComponent = engine.createComponent(TextureComponent.class);
-
-        overlayComponent.type = OverlayComponent.Type.TEXTURE;
-
-        positionComponent.x = 10f;
-        positionComponent.y = 10f;
-
-        renderingComponent.renderingType = RenderingComponent.RenderingType.OVERLAY;
-
-        textureComponent.region = new TextureRegion(assetManager.manager.get("onscreencontrols/shadedDark/shadedDark09.png", Texture.class));
-
-        Entity onScreenPadEntity = engine.createEntity();
-
-        onScreenPadEntity.add(overlayComponent);
-        onScreenPadEntity.add(renderingComponent);
-        onScreenPadEntity.add(positionComponent);
-        onScreenPadEntity.add(textureComponent);
-
-        engine.addEntity(onScreenPadEntity);
     }
 
     /**

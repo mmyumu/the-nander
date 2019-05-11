@@ -40,7 +40,7 @@ public class NanderGame extends Game {
         // loads the 2 sounds we use
         playingSong = assetManager.manager.get("music/Noir - Salva Nos.mp3", Music.class);
 
-        playingSong.play();
+//        playingSong.play();
     }
 
     public void changeScreen(NanderScreen screen) {

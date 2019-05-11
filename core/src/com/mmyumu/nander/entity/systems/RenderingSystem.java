@@ -10,11 +10,11 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
 import com.badlogic.gdx.utils.Array;
-import com.mmyumu.nander.entity.components.OverlayComponent;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mmyumu.nander.entity.components.ParticleEffectComponent;
 import com.mmyumu.nander.entity.components.PositionComponent;
 import com.mmyumu.nander.entity.components.RenderingComponent;
-import com.mmyumu.nander.entity.components.TextComponent;
 import com.mmyumu.nander.entity.components.TextureComponent;
 import com.mmyumu.nander.entity.components.TiledMapComponent;
 import com.mmyumu.nander.entity.components.TransformComponent;
@@ -23,6 +23,9 @@ import java.util.Comparator;
 
 
 public class RenderingSystem extends IteratingSystem {
+    public static final int VIEWPORT_WIDTH = 32;
+    public static final int VIEWPORT_HEIGHT = 15;
+
     /* This gets the height and width of our camera frustrum based off the width and height of the screen and our pixel per meter ratio */
     public static final float PPM = 32.0f; // sets the amount of pixels each metre of box2d objects contains
     private static final float FRUSTUM_WIDTH = Gdx.graphics.getWidth() / PPM;
@@ -31,22 +34,23 @@ public class RenderingSystem extends IteratingSystem {
 
     /* Rendering attributes */
     private final BitmapFont font;
-    private final SpriteBatch hudBatch;
+
+    //    private final SpriteBatch hudBatch;
+//    private final Stage stage;
+//    private final SpriteBatch hudBatch;
     private final SpriteBatch batch; // a reference to our spritebatch
+    private final FitViewport viewport;
     private OrthoCachedTiledMapRenderer mapRenderer;
     private int[] backgroundLayers;
     private int[] foregroundLayers;
     private final Array<Entity> renderQueue;
-    private final Array<Entity> overlayRenderQueue;
     private final Comparator<Entity> comparator;
     private final OrthographicCamera camera;
 
     /* Component mappers to get components from entities */
-    private final ComponentMapper<TextComponent> textComponentMapper;
     private final ComponentMapper<TextureComponent> textureComponentMapper;
     private final ComponentMapper<TransformComponent> transformComponentMapper;
     private final ComponentMapper<PositionComponent> positionComponentMapper;
-    private final ComponentMapper<OverlayComponent> overlayComponentMapper;
     private final ComponentMapper<TiledMapComponent> tiledMapComponentMapper;
     private final ComponentMapper<RenderingComponent> renderingComponentMapper;
     private final ComponentMapper<ParticleEffectComponent> particleEffectComponentMapper;
@@ -56,26 +60,27 @@ public class RenderingSystem extends IteratingSystem {
     public RenderingSystem(SpriteBatch batch) {
         super(Family.all(RenderingComponent.class).get());
 
-        textComponentMapper = ComponentMapper.getFor(TextComponent.class);
         textureComponentMapper = ComponentMapper.getFor(TextureComponent.class);
         transformComponentMapper = ComponentMapper.getFor(TransformComponent.class);
         positionComponentMapper = ComponentMapper.getFor(PositionComponent.class);
-        overlayComponentMapper = ComponentMapper.getFor(OverlayComponent.class);
         tiledMapComponentMapper = ComponentMapper.getFor(TiledMapComponent.class);
         renderingComponentMapper = ComponentMapper.getFor(RenderingComponent.class);
         particleEffectComponentMapper = ComponentMapper.getFor(ParticleEffectComponent.class);
 
         renderQueue = new Array<>();
-        overlayRenderQueue = new Array<>();
 
-        this.hudBatch = new SpriteBatch();
         this.batch = batch;  // set our batch to the one supplied in constructor
+//        this.hudBatch = new SpriteBatch();
 
         comparator = new ZComparator();
 
         // set up the camera to match our screen size
         camera = new OrthographicCamera(FRUSTUM_WIDTH, FRUSTUM_HEIGHT);
         camera.position.set(FRUSTUM_WIDTH / 2f, FRUSTUM_HEIGHT / 2f, 0);
+
+        viewport = new FitViewport(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, camera);
+        viewport.getCamera().update();
+
 
         this.font = new BitmapFont();
     }
@@ -86,7 +91,6 @@ public class RenderingSystem extends IteratingSystem {
 
         // sort the renderQueue based on z index
         renderQueue.sort(comparator);
-        overlayRenderQueue.sort(comparator);
 
         // update camera and sprite batch
         camera.update();
@@ -98,7 +102,6 @@ public class RenderingSystem extends IteratingSystem {
 
 
         batch.setProjectionMatrix(camera.combined);
-//        batch.enableBlending();
         batch.begin();
 
         // loop through each entity in our render queue
@@ -142,30 +145,6 @@ public class RenderingSystem extends IteratingSystem {
         if (mapRenderer != null) {
             mapRenderer.render(foregroundLayers);
         }
-
-        hudBatch.begin();
-
-        for (Entity entity : overlayRenderQueue) {
-            PositionComponent positionComponent = positionComponentMapper.get(entity);
-            OverlayComponent overlayComponent = overlayComponentMapper.get(entity);
-
-            if (overlayComponent.type == OverlayComponent.Type.TEXT) {
-                TextComponent textComponent = textComponentMapper.get(entity);
-                font.draw(hudBatch, textComponent.text, positionComponent.x, positionComponent.y);
-            } else if (overlayComponent.type == OverlayComponent.Type.TEXTURE) {
-                TextureComponent textureComponent = textureComponentMapper.get(entity);
-
-                float width = textureComponent.region.getRegionWidth();
-                float height = textureComponent.region.getRegionHeight();
-
-                hudBatch.draw(textureComponent.region,
-                        positionComponent.x, positionComponent.y,
-                        width, height);
-            }
-        }
-        overlayRenderQueue.clear();
-
-        hudBatch.end();
     }
 
     @Override
@@ -178,9 +157,6 @@ public class RenderingSystem extends IteratingSystem {
                 mapRenderer = component.mapRenderer;
                 backgroundLayers = component.backgroundLayers;
                 foregroundLayers = component.foregroundLayers;
-                break;
-            case OVERLAY:
-                overlayRenderQueue.add(entity);
                 break;
             case OBJECTS:
                 renderQueue.add(entity);
@@ -207,9 +183,12 @@ public class RenderingSystem extends IteratingSystem {
         }
     }
 
-    // convenience method to get camera
     public OrthographicCamera getCamera() {
         return camera;
+    }
+
+    public Viewport getViewport() {
+        return viewport;
     }
 
     private static float PixelsToMeters(float pixelValue) {
