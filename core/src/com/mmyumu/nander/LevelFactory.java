@@ -55,6 +55,8 @@ public class LevelFactory {
     private static final String BACKGROUND_LAYER_NAME = "background";
     private static final String FOREGROUND_LAYER_NAME = "foreground";
 
+    private static final float BORDER_OFFSET = 2.5f;
+
     private final ParticleEffectManager pem;
     private BodyFactory bodyFactory;
     public World world;
@@ -95,15 +97,10 @@ public class LevelFactory {
         TypeComponent type = engine.createComponent(TypeComponent.class);
         StateComponent stateCom = engine.createComponent(StateComponent.class);
         PositionComponent positionComponent = engine.createComponent(PositionComponent.class);
-        positionComponent.x = 1f;
-        positionComponent.y = 1f;
+        positionComponent.x = 20f;
+        positionComponent.y = 20f;
 
-//        textureComponent.region = playerTex;
-//        textureComponent.region = new TextureRegion(assetManager.manager.get("images/character1.png", Texture.class));
-//        textureComponent.region = new TextureRegion(assetManager.manager.get("images/character24.png", Texture.class));
         textureComponent.region = new TextureRegion(assetManager.manager.get("images/character30.png", Texture.class));
-//        textureComponent.region.setRegionHeight(32);
-//        textureComponent.region.setRegionWidth(32);
         transformComponent.scale.x = 2f;
         transformComponent.scale.y = 2f;
 
@@ -282,6 +279,8 @@ public class LevelFactory {
             }
         }
 
+        createBorders(backgroundLayer);
+
         layers.add(backgroundLayer);
         layers.add(foregroundLayer);
         return layers;
@@ -306,8 +305,8 @@ public class LevelFactory {
         TiledMapTileLayer backgroundLayerTemplate = (TiledMapTileLayer) zoneTemplate.getLayers().get(BACKGROUND_LAYER_NAME);
         TiledMapTileLayer foregroundLayerTemplate = (TiledMapTileLayer) zoneTemplate.getLayers().get(FOREGROUND_LAYER_NAME);
 
-        for (int y = 0; y < 20; y++) {
-            for (int x = 0; x < 20; x++) {
+        for (int y = 0; y < MAP_ZONE_SIZE; y++) {
+            for (int x = 0; x < MAP_ZONE_SIZE; x++) {
                 if (backgroundLayerTemplate != null) {
                     backgroundLayer.setCell(x + offsetX, y + offsetY, createCell(backgroundLayerTemplate, x, y));
                 }
@@ -345,6 +344,54 @@ public class LevelFactory {
         cell.setRotation(cellTemplate.getRotation());
 
         return cell;
+    }
+
+    /**
+     * Create blocking borders on the map
+     *
+     * @param backgroundLayer
+     */
+    private void createBorders(TiledMapTileLayer backgroundLayer) {
+        float totalWidth = MAP_ZONE_DIMENSION * MAP_ZONE_SIZE * MAP_TILE_WIDTH * TILED_MAP_RATIO;
+        float totalHeight = MAP_ZONE_DIMENSION * MAP_ZONE_SIZE * MAP_TILE_HEIGHT * TILED_MAP_RATIO;
+
+        float bottomY = (MAP_ZONE_SIZE - BORDER_OFFSET) * MAP_TILE_HEIGHT * TILED_MAP_RATIO;
+        float topY = ((MAP_ZONE_DIMENSION - 1) * MAP_ZONE_SIZE + BORDER_OFFSET) * MAP_TILE_HEIGHT * TILED_MAP_RATIO;
+
+        float leftX = (MAP_ZONE_SIZE - BORDER_OFFSET) * MAP_TILE_WIDTH * TILED_MAP_RATIO;
+        float rightX = ((MAP_ZONE_DIMENSION - 1) * MAP_ZONE_SIZE + BORDER_OFFSET) * MAP_TILE_WIDTH * TILED_MAP_RATIO;
+
+        // Add bottom border
+        bodyFactory.makeBoxPolyBody(totalWidth / 2,
+                bottomY,
+                totalWidth,
+                1,
+                BodyFactory.STONE,
+                BodyType.StaticBody);
+
+        // Add top border
+        bodyFactory.makeBoxPolyBody(totalWidth / 2,
+                topY,
+                totalWidth,
+                1,
+                BodyFactory.STONE,
+                BodyType.StaticBody);
+
+        // Add left border
+        bodyFactory.makeBoxPolyBody(leftX,
+                totalHeight / 2,
+                1,
+                totalHeight,
+                BodyFactory.STONE,
+                BodyType.StaticBody);
+
+        // Add right border
+        bodyFactory.makeBoxPolyBody(rightX,
+                totalHeight / 2,
+                1,
+                totalHeight,
+                BodyFactory.STONE,
+                BodyType.StaticBody);
     }
 
     public void removeEntity(Entity ent) {
