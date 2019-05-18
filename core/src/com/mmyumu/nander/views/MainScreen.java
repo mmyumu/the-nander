@@ -89,7 +89,7 @@ public class MainScreen implements Screen {
         overlay = new Overlay(inputs, parent.assetManager);
 
         inputMultiplexer = new InputMultiplexer();
-        inputMultiplexer.addProcessor(overlay.getStage());
+        inputMultiplexer.addProcessor(overlay);
         inputMultiplexer.addProcessor(controller);
     }
 
@@ -107,8 +107,8 @@ public class MainScreen implements Screen {
         engine.update(delta);
 
 
-        overlay.getStage().act();
-        overlay.getStage().draw();
+        overlay.act();
+        overlay.draw();
 
         //check if player is dead. if so show end screen
         PlayerComponent pc = (player.getComponent(PlayerComponent.class));
