@@ -2,7 +2,6 @@ package com.mmyumu.nander;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -28,8 +27,6 @@ import com.mmyumu.nander.entity.components.AnimationComponent;
 import com.mmyumu.nander.entity.components.B2dBodyComponent;
 import com.mmyumu.nander.entity.components.BulletComponent;
 import com.mmyumu.nander.entity.components.CollisionComponent;
-import com.mmyumu.nander.entity.components.FPSComponent;
-import com.mmyumu.nander.entity.components.OverlayComponent;
 import com.mmyumu.nander.entity.components.ParticleEffectComponent;
 import com.mmyumu.nander.entity.components.PlayerComponent;
 import com.mmyumu.nander.entity.components.PositionComponent;
@@ -222,23 +219,6 @@ public class LevelFactory {
 
         engine.addEntity(entity);
         return entity;
-    }
-
-    public void createFPS() {
-        OverlayComponent overlayComponent = new OverlayComponent();
-        PositionComponent positionComponent = new PositionComponent();
-        positionComponent.x = 10f;
-        positionComponent.y = Gdx.graphics.getHeight() - 10f;
-
-        RenderingComponent renderingComponent = engine.createComponent(RenderingComponent.class);
-        renderingComponent.renderingType = RenderingComponent.RenderingType.OVERLAY;
-
-        Entity fpsEntity = engine.createEntity();
-        fpsEntity.add(new FPSComponent());
-        fpsEntity.add(overlayComponent);
-        fpsEntity.add(renderingComponent);
-        fpsEntity.add(positionComponent);
-        engine.addEntity(fpsEntity);
     }
 
     /**
@@ -445,7 +425,7 @@ public class LevelFactory {
 
     public void resetWorld() {
         currentLevel = 0;
-        Array<Body> bods = new Array<Body>();
+        Array<Body> bods = new Array<>();
         world.getBodies(bods);
         for (Body bod : bods) {
             world.destroyBody(bod);
