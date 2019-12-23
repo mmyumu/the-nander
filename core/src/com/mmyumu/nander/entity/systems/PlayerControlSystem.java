@@ -4,18 +4,22 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mmyumu.nander.LevelFactory;
 import com.mmyumu.nander.controller.Inputs;
-import com.mmyumu.nander.controller.KeyboardController;
 import com.mmyumu.nander.entity.components.B2dBodyComponent;
 import com.mmyumu.nander.entity.components.ParticleEffectComponent;
 import com.mmyumu.nander.entity.components.PlayerComponent;
+import com.mmyumu.nander.entity.components.TextureComponent;
 import com.mmyumu.nander.entity.components.ZComponent;
+import com.mmyumu.nander.loader.NanderAssetManager;
+import com.mmyumu.nander.utils.Direction;
 
 public class PlayerControlSystem extends IteratingSystem {
     private static final float BULLET_SPEED = 15f;
@@ -28,20 +32,26 @@ public class PlayerControlSystem extends IteratingSystem {
     private final Inputs inputs;
     private final ComponentMapper<ParticleEffectComponent> particleEffectComponentMapper;
     private final ComponentMapper<ZComponent> zComponentMapper;
+    private final ComponentMapper<TextureComponent> textureComponentMapper;
     private LevelFactory levelFactory;
     private Viewport viewport;
+    private NanderAssetManager assetManager;
+
+    private Direction lastDirection;
 
     private final Vector2 playerMovement;
     private final Vector2 bulletMovement;
     private final Vector3 mousePos;
 
-
     @SuppressWarnings("unchecked")
-    public PlayerControlSystem(Inputs inputs, LevelFactory levelFactory, Viewport viewport) {
+    public PlayerControlSystem(Inputs inputs, LevelFactory levelFactory, Viewport viewport, NanderAssetManager assetManager) {
         super(Family.all(PlayerComponent.class).get());
         this.inputs = inputs;
         this.levelFactory = levelFactory;
         this.viewport = viewport;
+        this.assetManager = assetManager;
+
+        this.lastDirection = Direction.S;
 
         this.playerMovement = new Vector2();
         this.mousePos = new Vector3();
@@ -49,6 +59,7 @@ public class PlayerControlSystem extends IteratingSystem {
 
         this.playerComponentMapper = ComponentMapper.getFor(PlayerComponent.class);
         this.b2dBodyComponentMapper = ComponentMapper.getFor(B2dBodyComponent.class);
+        this.textureComponentMapper = ComponentMapper.getFor(TextureComponent.class);
         this.particleEffectComponentMapper = ComponentMapper.getFor(ParticleEffectComponent.class);
         this.zComponentMapper = ComponentMapper.getFor(ZComponent.class);
     }
@@ -57,26 +68,16 @@ public class PlayerControlSystem extends IteratingSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         B2dBodyComponent b2body = b2dBodyComponentMapper.get(entity);
         PlayerComponent playerComponent = playerComponentMapper.get(entity);
+        TextureComponent textureComponent = textureComponentMapper.get(entity);
 
         playerComponent.camera.position.x = b2body.body.getPosition().x;
         playerComponent.camera.position.y = b2body.body.getPosition().y;
 
-        playerMovement.set(0, 0);
+        updatePlayerMovement();
 
-        if (inputs.isLeft()) {
-            playerMovement.x -= 1;
-        }
-        if (inputs.isRight()) {
-            playerMovement.x += 1;
-        }
-        if (inputs.isUp()) {
-            playerMovement.y += 1;
+        updateLastDirection();
 
-        }
-        if (inputs.isDown()) {
-            playerMovement.y -= 1;
-        }
-
+        textureComponent.region = getTexture();
 
         playerMovement.nor();   // Caps the playerMovement vector at a length of one, even when it's at an odd angle
 
@@ -145,6 +146,68 @@ public class PlayerControlSystem extends IteratingSystem {
                 bulletMovement.nor();
                 levelFactory.createBullet(shooterX, shooterY, bulletMovement.x * BULLET_SPEED, bulletMovement.y * BULLET_SPEED);
                 playerComponent.timeSinceLastShot = playerComponent.shootDelay;
+            }
+        }
+    }
+
+    private TextureRegion getTexture() {
+        String texturePath;
+        if (playerMovement.isZero()) {
+            texturePath = "images/character30_" + lastDirection.name() + ".png";
+        } else {
+            texturePath = "images/character30_" + lastDirection.name() + "_fly.png";
+        }
+
+        return new TextureRegion(assetManager.manager.get(texturePath, Texture.class));
+    }
+
+    private void updatePlayerMovement() {
+        playerMovement.set(0, 0);
+
+        if (inputs.isLeft()) {
+            playerMovement.x -= 1;
+        }
+        if (inputs.isRight()) {
+            playerMovement.x += 1;
+        }
+        if (inputs.isUp()) {
+            playerMovement.y += 1;
+
+        }
+        if (inputs.isDown()) {
+            playerMovement.y -= 1;
+        }
+    }
+
+    private void updateLastDirection() {
+        // West
+        if (playerMovement.x == -1) {
+            if (playerMovement.y == 1) {
+                lastDirection = Direction.NW;
+            } else if (playerMovement.y == -1) {
+                lastDirection = Direction.SW;
+            } else {
+                lastDirection = Direction.W;
+            }
+        }
+
+        // Neither WEST/EAST
+        if (playerMovement.x == 0) {
+            if (playerMovement.y == 1) {
+                lastDirection = Direction.N;
+            } else if (playerMovement.y == -1) {
+                lastDirection = Direction.S;
+            }
+        }
+
+        // East
+        if (playerMovement.x == 1) {
+            if (playerMovement.y == 1) {
+                lastDirection = Direction.NE;
+            } else if (playerMovement.y == -1) {
+                lastDirection = Direction.SE;
+            } else {
+                lastDirection = Direction.E;
             }
         }
     }

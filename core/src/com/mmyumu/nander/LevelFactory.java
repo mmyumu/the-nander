@@ -100,7 +100,7 @@ public class LevelFactory {
         positionComponent.x = 20f;
         positionComponent.y = 20f;
 
-        textureComponent.region = new TextureRegion(assetManager.manager.get("images/character30.png", Texture.class));
+//        textureComponent.region = new TextureRegion(assetManager.manager.get("images/character30.png", Texture.class));
         transformComponent.scale.x = 2f;
         transformComponent.scale.y = 2f;
 

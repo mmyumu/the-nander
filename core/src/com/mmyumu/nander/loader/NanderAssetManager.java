@@ -12,16 +12,13 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.mmyumu.nander.utils.Direction;
 
 public class NanderAssetManager {
     public final AssetManager manager = new AssetManager();
 
     public final String gameImages = "images/game.atlas";
     public final String loadingImages = "images/loading.atlas";
-
-    //    public final String characterImage = "images/character1.png";
-//    public final String characterImage24 = "images/character24.png";
-    public final String characterImage30 = "images/character30.png";
 
     public final String onScreenPad = "onscreencontrols/shadedDark/shadedDark09.png";
 
@@ -56,10 +53,13 @@ public class NanderAssetManager {
 
     public void queueAddLoadingImages() {
         manager.load(loadingImages, TextureAtlas.class);
-//        manager.load(characterImage, Texture.class);
-//        manager.load(characterImage24, Texture.class);
-        manager.load(characterImage30, Texture.class);
         manager.load(onScreenPad, Texture.class);
+
+        for (Direction direction : Direction.values()) {
+            manager.load("images/character30_" + direction.name() + ".png", Texture.class);
+            manager.load("images/character30_" + direction.name() + "_fly.png", Texture.class);
+        }
+
     }
 
     public void queueAddSounds() {
